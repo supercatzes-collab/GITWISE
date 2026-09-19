@@ -23,9 +23,9 @@ fn Navbar() -> Element {
     rsx! {
         nav { id: "navbar", class: "container",
             div { class: "nav_item", id: "nav_home", "home" }
-            div { class: "nav_item", id: "nav_library", "library" }
-            div { class: "nav_item", id: "nav_watching", "watching" }
-            div { class: "nav_item", id: "nav_settings", "settings" }
+            div { class: "nav_item", "library" }
+            div { class: "nav_item", "notif" }
+            div { class: "nav_item", "settings" }
         }
     }
 }
@@ -60,7 +60,7 @@ pub fn Hero() -> Element {
             div { class: "container", id: "center_container",
                 div { class: "container", id: "header",
                     h1 { id: "works_title", "WORKS" }
-                    button { class: "button", id: "new_works_button", "+" }
+                    button { class: "button", id: "new_works_button", "NEW" }
                 }
 
                 //example of calling the work_item object builder

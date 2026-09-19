@@ -7,6 +7,8 @@
     --color-accent: #00c8fa;
     --color-text: #ffffff;
     --font-body: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+    --radius-sm: 5%;
 }
 
 /* App-wide */
@@ -29,8 +31,8 @@ body {
     height: 30px;
     background-color: var(--color-surface);
 
-    justify-content: space-evenly;
     flex-direction: row;
+    justify-content: space-evenly;
     align-items: center;
 }
 
@@ -43,11 +45,20 @@ body {
     align-self: center;
     flex-direction: row;
     width: 100%;
-    height: 100%;
+    height: max-content;
 
     border: 10px solid var(--color-bg);
     border-right: none;
     border-left: none;
+}
+
+#center_container {
+    flex-direction: column;
+    width: 100%;
+    min-height: 100vh;
+
+    border-left: 10px solid var(--color-bg);
+    padding: 1%;
 }
 
 #hero {
@@ -58,20 +69,96 @@ body {
     align-items: center;
 }
 
-#works_title {
+#header {
+    flex-direction: row;
+    align-items: center;
+
     width: 100%;
-    padding-left: 3%;
+    padding-left: 5.5%;
+
+    column-gap: 10px;
+}
+
+#new_works_button {
+    width: 30px;
+    height: 30px;
+
+    font-size: 2rem;
+    color: var(--color-text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+    background-color: var(--color-bg-subtle);
+    border-radius: 4px; /* square-ish, slightly rounded corners */
+}
+
+#new_works_button:hover {
+    background-color: var(--color-bg-raised);
+}
+
+.nav_item {
+    width: max-content;
+    height: max-content;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    padding: 1px;
+}
+
+.nav_item:hover {
+    background-color: var(--color-bg-raised);
+    border-radius: 4px;
 }
 
 #contents_container {
     align-self: center;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 80px;
+    gap: 50px;
     height: max-content;
 }
 
-/* Profile */
+.works_item {
+    box-sizing: border-box;
+    background-color: var(--color-bg-raised);
+
+    width: 300px;
+    height: 350px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    border-radius: var(--radius-sm);
+    padding-top: 5%;
+}
+
+.content_img {
+    width: 90%;
+    height: 60%;
+
+    background-color: var(--color-bg);
+    border-radius: var(--radius-sm);
+    object-fit: contain;
+}
+
+.content_title {
+    font-size: 1rem;
+    box-sizing: border-box;
+    width: 90%;
+    height: 40%;
+
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
 #profile_details_container {
     width: 20%;
     height: 100%;
@@ -112,48 +199,58 @@ body {
     padding-left: 10px;
 }
 
-#center_container {
-    flex-direction: column;
-    width: 100%;
-    height: 100vh;
-
-    border-left: 10px solid var(--color-bg);
-    padding: 1%;
-}
-
-.works_item {
+#upload_mother_container {
     box-sizing: border-box;
-    background-color: var(--color-bg-raised);
-
-    width: 300px;
-    height: 350px;
-
-    display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
+    justify-self: center;
 
-    border-radius: 5%;
-    padding-top: 5%;
+    border-top: 10px solid var(--color-bg);
+    width: 30%;
+    height: max-content;
+
+    padding: 1%;
+    border-radius: var(--radius-sm);
+    gap: 20px;
 }
 
-.content_img {
-    width: 90%;
-    height: 60%;
+#upload_title, #upload_abstract, #upload_image, #upload_zipfile {
+    display: flex;
+    flex-direction: column;
+    font-size: 0.7rem;
+    color: #b8b4b4;
 
-    background-color: var(--color-bg);
-    border-radius: 5%;
-    object-fit: contain;
+    justify-content: space-evenly;
+    margin: 0;
+    width: 100%;
+    height: max-content;
 }
 
-.content_title {
-    font-size: 1rem;
+#upload_input_title, #upload_input_abstract, #upload_input_image, #upload_input_zipfile {
+    border-radius: 20px;
+
+    outline: none;
+    border: solid var(--color-border);
+}
+
+#upload_input_title {
+    height: 50px;
+}
+
+#upload_input_abstract {
+    height: 300px;
+}
+
+#upload_button {
     box-sizing: border-box;
-    width: 90%;
-    height: 40%;
+    width: 100%;
+    height: 30px;
+    flex-shrink: 0;
 
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+    border-radius: 5px;
+    border: none;
 }
+
+
+
