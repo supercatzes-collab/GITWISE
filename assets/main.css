@@ -229,9 +229,11 @@ body {
 
 #upload_input_title, #upload_input_abstract, #upload_input_image, #upload_input_zipfile {
     border-radius: 20px;
+    width: 100%;
 
     outline: none;
     border: solid var(--color-border);
+    background: transparent;
 }
 
 #upload_input_title {
@@ -239,18 +241,66 @@ body {
 }
 
 #upload_input_abstract {
-    height: 300px;
+    height: 100px;
+}
+
+#upload_input_image {
+    height: 150px;
+    border-style: dashed;
+}
+
+#upload_input_zipfile, #upload_input_image {
+    height: 150px;
+    border-style: dashed;
+    border-color: chartreuse;
 }
 
 #upload_button {
     box-sizing: border-box;
     width: 100%;
-    height: 30px;
+    height: 40px;
     flex-shrink: 0;
 
-    border-radius: 5px;
+    border-radius: 15px;
     border: none;
+
+    background-color: chartreuse;
+    transition: transform 0.15s ease, filter 0.15s ease;
+    cursor: pointer;
 }
 
+#upload_button:hover {
+    filter: brightness(0.5);
+}
 
+#upload_button:active {
+    transform: scale(0.96);
+    filter: brightness(0.9);
+}
+
+#upload_zipfile > div {
+    position: relative;
+}
+
+#upload_zipfile svg {
+    color: chartreuse; /* set to whatever color you want */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+}
+
+#upload_image > div {
+    position: relative;
+}
+
+#upload_image svg {
+    color: chartreuse;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+}
 
