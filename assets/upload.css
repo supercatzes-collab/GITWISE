@@ -19,7 +19,7 @@
 #upload_title, #upload_abstract, #upload_image, #upload_zipfile {
     display: flex;
     flex-direction: column;
-    align-items: stretch;      /* was duplicated w/ align-items:center elsewhere — stretch wins/kept */
+    align-items: stretch;
     justify-content: space-evenly;
 
     width: 100%;
@@ -46,6 +46,7 @@
     border-radius: 10px;
     background-color: #3a3a3d;
     outline: none;
+    transition: transform 0.15s ease, filter 0.15s ease;
 }
 
 /* Per-input heights */
@@ -55,12 +56,40 @@
 
 #upload_input_abstract {
     height: 100px;
+    resize: vertical;
+}
+
+#upload_input_title {
+    resize: vertical;
 }
 
 #upload_input_image, #upload_input_zipfile {
     height: 150px;
     border-style: dashed;
     border-color: chartreuse;
+}
+
+/* File input hover/active animation (matches #upload_button) */
+#upload_input_image:hover, #upload_input_zipfile:hover {
+    filter: brightness(0.5);
+    cursor: pointer;
+}
+
+#upload_input_image:active, #upload_input_zipfile:active {
+    transform: scale(0.96);
+    filter: brightness(0.9);
+}
+
+/* Hide native "No file chosen" label + choose-file button */
+#upload_input_image, #upload_input_zipfile {
+    color: transparent;
+}
+
+#upload_input_image::file-selector-button,
+#upload_input_zipfile::file-selector-button,
+#upload_input_image::-webkit-file-upload-button,
+#upload_input_zipfile::-webkit-file-upload-button {
+    display: none;
 }
 
 /* ============ Icon overlays (image/zip dropzones) ============ */
@@ -75,6 +104,7 @@
     transform: translate(-50%, -50%);
     color: chartreuse;
     pointer-events: none;
+    z-index: 1;
 }
 
 /* ============ Upload button ============ */
@@ -100,27 +130,17 @@
     filter: brightness(0.9);
 }
 
-#upload_input_image, #upload_input_zipfile {
-    color: transparent; /* hides "No file chosen" text */
-}
-
-#upload_input_image::file-selector-button,
-#upload_input_zipfile::file-selector-button,
-#upload_input_image::-webkit-file-upload-button,
-#upload_input_zipfile::-webkit-file-upload-button {
-    display: none;
-}
-
-#upload_input_title, #upload_input_abstract {
-    resize: vertical;
-}
-
-/* Hide scrollbar but keep scrolling functional */
+/* ============ Scrollbar (hidden, scrolling still works) ============ */
 html, body {
     scrollbar-width: none;       /* Firefox */
     -ms-overflow-style: none;    /* old Edge/IE */
 }
 
 html::-webkit-scrollbar, body::-webkit-scrollbar {
-    display: none;               /* Chrome, Edge, Safari (webview uses this engine) */
+    display: none;               /* Chrome, Edge, Safari */
+}
+
+#upload_input_title, #upload_input_abstract {
+    color: #fff;
+    font-size: 1.2rem;
 }
