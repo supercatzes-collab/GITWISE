@@ -1,0 +1,126 @@
+/* ============ Upload panel (outer container) ============ */
+#upload_mother_container {
+    box-sizing: border-box;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    justify-self: center;
+
+    width: 30%;
+    height: max-content;
+    padding: 1%;
+
+    border-top: 10px solid var(--color-bg);
+    border-radius: var(--radius-sm);
+    gap: 20px;
+}
+
+/* ============ Field wrappers (label + input group) ============ */
+#upload_title, #upload_abstract, #upload_image, #upload_zipfile {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;      /* was duplicated w/ align-items:center elsewhere — stretch wins/kept */
+    justify-content: space-evenly;
+
+    width: 100%;
+    height: max-content;
+    margin: 0;
+
+    font-size: 0.7rem;
+    color: #b8b4b4;
+}
+
+/* Field labels (left-aligned) */
+#upload_research_title, #upload_header_abstract, #upload_header_image, #upload_header_zipfile {
+    display: flex;
+    justify-content: flex-start;
+    width: max-content;
+}
+
+/* ============ Inputs (shared) ============ */
+#upload_input_title, #upload_input_abstract, #upload_input_image, #upload_input_zipfile {
+    box-sizing: border-box;
+    width: 100%;
+
+    border: solid var(--color-border);
+    border-radius: 10px;
+    background-color: #3a3a3d;
+    outline: none;
+}
+
+/* Per-input heights */
+#upload_input_title {
+    height: 50px;
+}
+
+#upload_input_abstract {
+    height: 100px;
+}
+
+#upload_input_image, #upload_input_zipfile {
+    height: 150px;
+    border-style: dashed;
+    border-color: chartreuse;
+}
+
+/* ============ Icon overlays (image/zip dropzones) ============ */
+#upload_image > div, #upload_zipfile > div {
+    position: relative;
+}
+
+#upload_image svg, #upload_zipfile svg {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: chartreuse;
+    pointer-events: none;
+}
+
+/* ============ Upload button ============ */
+#upload_button {
+    box-sizing: border-box;
+    width: 100%;
+    height: 40px;
+    flex-shrink: 0;
+
+    border: none;
+    border-radius: 15px;
+    background-color: chartreuse;
+    cursor: pointer;
+    transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+#upload_button:hover {
+    filter: brightness(0.5);
+}
+
+#upload_button:active {
+    transform: scale(0.96);
+    filter: brightness(0.9);
+}
+
+#upload_input_image, #upload_input_zipfile {
+    color: transparent; /* hides "No file chosen" text */
+}
+
+#upload_input_image::file-selector-button,
+#upload_input_zipfile::file-selector-button,
+#upload_input_image::-webkit-file-upload-button,
+#upload_input_zipfile::-webkit-file-upload-button {
+    display: none;
+}
+
+#upload_input_title, #upload_input_abstract {
+    resize: vertical;
+}
+
+/* Hide scrollbar but keep scrolling functional */
+html, body {
+    scrollbar-width: none;       /* Firefox */
+    -ms-overflow-style: none;    /* old Edge/IE */
+}
+
+html::-webkit-scrollbar, body::-webkit-scrollbar {
+    display: none;               /* Chrome, Edge, Safari (webview uses this engine) */
+}
