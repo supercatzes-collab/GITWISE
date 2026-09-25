@@ -1,0 +1,25 @@
+#mother_container {
+    align-self: center;
+    flex-direction: row;
+    width: 100%;
+    height: max-content;
+
+    border-top: 10px solid var(--color-bg);
+}
+
+#center_container {
+    flex-direction: column;
+    width: 60%;
+    min-height: 100vh;
+
+    border-left: 10px solid var(--color-bg);
+    padding: 1%;
+}
+
+#details_container {
+    flex-direction: column;
+    width: 40%;
+    height: 100vh;
+
+    border-left: 10px solid var(--color-bg);
+}

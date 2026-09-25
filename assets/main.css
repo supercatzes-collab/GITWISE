@@ -1,7 +1,7 @@
 :root {
     --color-bg: #0d1117;
     --color-surface: #161b22;
-    --color-bg-raised: #b8b4b4;
+    --color-bg-raised: #9e9b9b;
     --color-border: #30363d;
     --color-border-subtle: #666667;
     --color-accent: #00c8fa;
@@ -36,66 +36,12 @@ body {
     align-items: center;
 }
 
-#nav_home {
-    border-bottom: 1px solid var(--color-accent);
-}
-
-/* Layout shell */
-#mother_container {
-    align-self: center;
-    flex-direction: row;
-    width: 100%;
-    height: max-content;
-
-    border: 10px solid var(--color-bg);
-    border-right: none;
-    border-left: none;
-}
-
-#center_container {
-    flex-direction: column;
-    width: 100%;
-    min-height: 100vh;
-
-    border-left: 10px solid var(--color-bg);
-    padding: 1%;
-}
-
 #hero {
     margin: 0;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-}
-
-#header {
-    flex-direction: row;
-    align-items: center;
-
-    width: 100%;
-    padding-left: 5.5%;
-
-    column-gap: 10px;
-}
-
-#new_works_button {
-    width: 30px;
-    height: 30px;
-
-    font-size: 2rem;
-    color: var(--color-text);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    border: none;
-    background-color: var(--color-bg-subtle);
-    border-radius: 4px; /* square-ish, slightly rounded corners */
-}
-
-#new_works_button:hover {
-    background-color: var(--color-bg-raised);
 }
 
 .nav_item {
@@ -114,14 +60,6 @@ body {
     border-radius: 4px;
 }
 
-#contents_container {
-    align-self: center;
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 50px;
-    height: max-content;
-}
-
 .works_item {
     box-sizing: border-box;
     background-color: var(--color-bg-raised);
@@ -135,6 +73,17 @@ body {
 
     border-radius: var(--radius-sm);
     padding-top: 5%;
+    cursor: pointer;
+    transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.works_item:hover {
+    filter: brightness(0.5);
+}
+
+.works_item:active {
+    transform: scale(0.96);
+    filter: brightness(0.9);
 }
 
 .content_img {
@@ -150,7 +99,6 @@ body {
     font-size: 1rem;
     box-sizing: border-box;
     width: 90%;
-    height: 40%;
 
     display: -webkit-box;
     -webkit-line-clamp: 3;
@@ -197,4 +145,39 @@ body {
 
     border-left: 5px solid var(--color-border-subtle);
     padding-left: 10px;
+}
+
+.content_author {
+    box-sizing: border-box;
+    width: 90%;
+    height: max-content;
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    column-gap: 10px;
+}
+
+.content_profile {
+    object-fit: cover;
+    border-radius: 50%;
+
+    width: 30px;
+    height: 30px;
+}
+
+.content_author_class_text, .content_date_class {
+    font-size: 0.9rem;
+    color: var(--color-border-subtle);
+}
+
+/* ============ Scrollbar (hidden, scrolling still works) ============ */
+html, body {
+    scrollbar-width: none;       /* Firefox */
+    -ms-overflow-style: none;    /* old Edge/IE */
+}
+
+html::-webkit-scrollbar, body::-webkit-scrollbar {
+    display: none;               /* Chrome, Edge, Safari */
 }

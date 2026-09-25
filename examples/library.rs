@@ -1,8 +1,7 @@
 use dioxus::{html::{h1, ul}, prelude::*};
 //const FAVICON: Asset = asset!("/assets/favicon.ico");
 const MAIN_CSS: Asset = asset!("/assets/main.css");
-const HOME_CSS: Asset = asset!("/assets/home.css");
-
+const LIBRARY_CSS: Asset = asset!("/assets/library.css");
 //const HEADER_SVG: Asset = asset!("/assets/header.svg");
 
 fn main() {
@@ -14,7 +13,7 @@ fn App() -> Element {
     rsx! {
         //document::Link { rel: "icon", href: FAVICON }
         document::Link { rel: "stylesheet", href: MAIN_CSS }
-        document::Link { rel: "stylesheet", href: HOME_CSS }
+        document::Link { rel: "stylesheet", href: LIBRARY_CSS }
         //Router::<Route> {}
         Navbar {}
         Hero {}
@@ -62,8 +61,12 @@ pub fn Hero() -> Element {
 
             div { class: "container", id: "center_container",
                 div { class: "container", id: "header",
-                    h1 { id: "works_title", "WORKS" }
-                    button { class: "button", id: "new_works_button", "+" }
+                    h1 { id: "works_title", "PUBLIC LIBRARY" }
+                    input {
+                        id: "search_bar",
+                        placeholder: "Search research title",
+                        r#type: "text",
+                    }
                 }
 
                 //example of calling the work_item object builder
@@ -72,8 +75,6 @@ pub fn Hero() -> Element {
                 //    img_src: asset!("/assets/img_assets/thumbnail.jpg"),
                 //    title: "Lorem ipsum dolor sit amet...",
                 //}
-
-                //what the object should look like
                 div { class: "container", id: "contents_container",
                     //what the object should look like
                     div { class: "works_item", id: "work_id",
@@ -100,7 +101,7 @@ pub fn Hero() -> Element {
                             h1 {
                                 class: "content_date_class",
                                 id: "content_date_id",
-                                " | 09/25/26"
+                                "| 09/25/26"
                             }
                         }
                     }
@@ -127,7 +128,7 @@ fn WorkItem(id: String, img_src: Asset, title: String, author: String, date: Str
                     id: "content_author_id_text_{id}",
                     "{author}"
                 }
-                h1 { class: "content_date_class", id: "content_date_id_{id}", " | {date}" }
+                h1 { class: "content_date_class", id: "content_date_id_{id}", "| {date}" }
             }
         }
     }

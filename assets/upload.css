@@ -130,16 +130,6 @@
     filter: brightness(0.9);
 }
 
-/* ============ Scrollbar (hidden, scrolling still works) ============ */
-html, body {
-    scrollbar-width: none;       /* Firefox */
-    -ms-overflow-style: none;    /* old Edge/IE */
-}
-
-html::-webkit-scrollbar, body::-webkit-scrollbar {
-    display: none;               /* Chrome, Edge, Safari */
-}
-
 #upload_input_title, #upload_input_abstract {
     color: #fff;
     font-size: 1.2rem;

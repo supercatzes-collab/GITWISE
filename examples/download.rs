@@ -1,6 +1,7 @@
 use dioxus::{html::{h1, ul}, prelude::*};
 //const FAVICON: Asset = asset!("/assets/favicon.ico");
 const MAIN_CSS: Asset = asset!("/assets/main.css");
+const DOWNLOAD_CSS: Asset = asset!("/assets/download.css");
 //const HEADER_SVG: Asset = asset!("/assets/header.svg");
 
 fn main() {
@@ -12,6 +13,7 @@ fn App() -> Element {
     rsx! {
         //document::Link { rel: "icon", href: FAVICON }
         document::Link { rel: "stylesheet", href: MAIN_CSS }
+        document::Link { rel: "stylesheet", href: DOWNLOAD_CSS }
         //Router::<Route> {}
         Navbar {}
         Hero {}
@@ -23,9 +25,9 @@ fn Navbar() -> Element {
     rsx! {
         nav { id: "navbar", class: "container",
             div { class: "nav_item", id: "nav_home", "home" }
-            div { class: "nav_item", "library" }
-            div { class: "nav_item", "notif" }
-            div { class: "nav_item", "settings" }
+            div { class: "nav_item", id: "nav_library", "library" }
+            div { class: "nav_item", id: "nav_watching", "watching" }
+            div { class: "nav_item", id: "nav_settings", "settings" }
         }
     }
 }
@@ -57,44 +59,10 @@ pub fn Hero() -> Element {
                 }
             }
 
-            div { class: "container", id: "center_container",
-                div { class: "container", id: "header",
-                    h1 { id: "works_title", "WORKS" }
-                    button { class: "button", id: "new_works_button", "NEW" }
-                }
+            div { class: "container", id: "center_container" }
 
-                //example of calling the work_item object builder
-                //WorkItem {
-                //    id: "work_1",
-                //    img_src: asset!("/assets/img_assets/thumbnail.jpg"),
-                //    title: "Lorem ipsum dolor sit amet...",
-                //}
-
-                //what the object should look like
-                div { class: "container", id: "contents_container",
-                    div { class: "works_item", id: "work_id",
-                        img {
-                            src: asset!("/assets/img_assets/thumbnail.jpg"),
-                            class: "content_img",
-                        }
-                        h1 { class: "content_title",
-                            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore 
-                            "
-                        }
-                    }
-                }
-            }
+            div { class: "container", id: "details_container" }
         }
     }
 }
 
-//function to build the contents object
-#[component]
-fn WorkItem(id: String, img_src: Asset, title: String) -> Element {
-    rsx! {
-        div { class: "works_item", id: "{id}",
-            img { src: img_src, class: "content_img" }
-            h1 { class: "content_title", "{title}" }
-        }
-    }
-}
