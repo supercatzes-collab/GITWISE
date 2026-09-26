@@ -1,3 +1,8 @@
+/* ============ Page layout shell ============ */
+#nav_library {
+    border-bottom: 1px solid var(--color-accent);
+}
+
 #mother_container {
     align-self: center;
     flex-direction: row;
@@ -8,18 +13,193 @@
 }
 
 #center_container {
+    box-sizing: border-box;
     flex-direction: column;
     width: 60%;
     min-height: 100vh;
 
     border-left: 10px solid var(--color-bg);
+    border-right: 10px solid var(--color-bg);
     padding: 1%;
 }
 
 #details_container {
     flex-direction: column;
-    width: 40%;
+    width: 30%;
     height: 100vh;
 
-    border-left: 10px solid var(--color-bg);
+    padding: 1%;
+}
+
+/* ============ Profile / info block ============ */
+#info_container {
+    flex-direction: column;
+    align-items: flex-start;
+    width: 250px;
+    height: max-content;
+}
+
+#upload_date, #contributions_text {
+    margin: 0;
+}
+
+.info_label {
+    color: var(--color-border-subtle);
+}
+
+.info_value {
+    color: var(--color-text);
+}
+
+#view_profile_button {
+    width: 250px;
+    height: 50px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    color: var(--color-text);
+
+    background-color: var(--color-surface);
+    border: 2px solid var(--color-bg-raised);
+    transition: background-color 0.15s ease, transform 0.15s ease, filter 0.15s ease;
+}
+
+#view_profile_button:hover {
+    background-color: var(--color-border-subtle);
+}
+
+#view_profile_button:active {
+    transform: scale(0.96);
+    filter: brightness(0.9);
+}
+
+/* ============ Research content (title, abstract, tags) ============ */
+#research_title {
+    margin-bottom: 0;
+    margin-top: 0;
+}
+
+#abstract_body {
+    margin-top: 0;
+}
+
+.tag {
+    box-sizing: border-box;
+    width: max-content;
+    height: max-content;
+    color: chartreuse;
+
+    padding: 5px;
+    border-radius: 10px;
+    border: 1px solid chartreuse;
+    margin: 10px;
+    margin-left: 0;
+}
+
+#thumbnail_img {
+    width: 100%;
+    height: 30%;
+    background-color: var(--color-bg);
+    object-fit: contain;
+}
+
+/* ============ Buttons (download / contribute) ============ */
+#download_button {
+    background-color: var(--color-surface);
+    border: 1px solid chartreuse;
+    color: chartreuse;
+    height: 50px;
+    transition: background-color 0.15s ease, transform 0.15s ease, filter 0.15s ease;
+}
+
+#download_button:hover {
+    background-color: var(--color-border-subtle);
+}
+
+#download_button:active {
+    transform: scale(0.96);
+    filter: brightness(0.9);
+}
+
+#contribute_button {
+    background-color: var(--color-surface);
+    border: 2px solid chartreuse;
+    color: chartreuse;
+
+    border-radius: 5px;
+    height: 60px;
+    margin-top: 50px;
+    transition: background-color 0.15s ease, transform 0.15s ease, filter 0.15s ease;
+}
+
+#contribute_button:hover {
+    background-color: var(--color-border-subtle);
+}
+
+#contribute_button:active {
+    transform: scale(0.96);
+    filter: brightness(0.9);
+}
+
+/* ============ Stat boxes ============ */
+.stat_box {
+    width: 100%;
+    height: 60px;
+    color: var(--color-text);
+    border: 2px solid var(--color-bg-raised);
+
+    margin-bottom: 10px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    border-radius: 5px;
+    background-color: var(--color-surface);
+    transition: background-color 0.15s ease, transform 0.15s ease, filter 0.15s ease;
+}
+
+.stat_box:hover {
+    background-color: var(--color-border-subtle);
+}
+
+.stat_box:active {
+    transform: scale(0.96);
+    filter: brightness(0.9);
+}
+
+/* ============ Contributors list ============ */
+#contributors_list {
+    flex-direction: column;
+
+    border-radius: 5px;
+    margin-top: 50px;
+    width: 100%;
+    height: max-content;
+    padding: 3%;
+    border: 2px solid chartreuse;
+}
+
+#contributors_label {
+    margin-bottom: 0;
+    font-size: 1.2rem;
+    color: chartreuse;
+}
+
+.contributors_card {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    height: max-content;
+
+    border-bottom: 2px solid chartreuse;
+    column-gap: 10px;
+}
+
+.contributor_profile_img {
+    object-fit: cover;
+    border-radius: 50%;
+
+    width: 30px;
+    height: 30px;
 }

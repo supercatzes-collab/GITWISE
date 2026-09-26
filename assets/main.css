@@ -172,6 +172,16 @@ body {
     color: var(--color-border-subtle);
 }
 
+.button {
+    outline: none;
+    box-shadow: none;
+    appearance: none;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
 /* ============ Scrollbar (hidden, scrolling still works) ============ */
 html, body {
     scrollbar-width: none;       /* Firefox */
