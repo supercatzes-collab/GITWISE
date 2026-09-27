@@ -180,7 +180,19 @@ body {
     -webkit-appearance: none;
     appearance: none;
     -webkit-tap-highlight-color: transparent;
+    background-color: var(--color-surface);
+    transition: background-color 0.15s ease, transform 0.15s ease, filter 0.15s ease;
 }
+
+.button:hover {
+    background-color: var(--color-border-subtle);
+}
+
+.button:active {
+    transform: scale(0.96);
+    filter: brightness(0.9);
+}
+
 
 /* ============ Scrollbar (hidden, scrolling still works) ============ */
 html, body {

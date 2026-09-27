@@ -185,7 +185,7 @@
     color: chartreuse;
 }
 
-.contributors_card {
+.contributors_card {  
     display: flex;
     flex-direction: row;
     align-items: center;

@@ -26,7 +26,7 @@ fn Navbar() -> Element {
         nav { id: "navbar", class: "container",
             div { class: "nav_item", id: "nav_home", "home" }
             div { class: "nav_item", id: "nav_library", "library" }
-            div { class: "nav_item", id: "nav_watching", "watching" }
+            div { class: "nav_item", id: "nav_watching", "notifications" }
             div { class: "nav_item", id: "nav_settings", "settings" }
         }
     }
