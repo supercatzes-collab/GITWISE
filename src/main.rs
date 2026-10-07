@@ -1,44 +1,36 @@
 use dioxus::prelude::*;
 
-//#[derive(Debug, Clone, Routable, PartialEq)]
-#[rustfmt::skip]
-//enum Route {
-//    #[layout(Navbar)]
-//    #[route("/")]
-//    Home {},
-//    #[route("/blog/:id")]
-//    Blog { id: i32 },
-//}
+mod components;
+mod navbar;
+mod pages;
+mod route;
 
-//const FAVICON: Asset = asset!("/assets/favicon.ico");
-const MAIN_CSS: Asset = asset!("/assets/main.css");
-//const HEADER_SVG: Asset = asset!("/assets/header.svg");
+use route::Route;
+//use crate::components::WorkItem;
 
 fn main() {
     dioxus::launch(App);
 }
 
+const MAIN_CSS: Asset = asset!("/assets/main.css");
+const HOME_CSS: Asset = asset!("/assets/home.css");
+const LIBRARY_CSS: Asset = asset!("/assets/library.css");
+const DOWNLOAD_CSS: Asset = asset!("/assets/download.css");
+const NOTIFICATION_CSS: Asset = asset!("/assets/notifications.css");
+const CONTRIBUTE_CSS: Asset = asset!("/assets/contribute.css");
+const UPLOAD_CSS: Asset = asset!("/assets/upload.css");
+
+
 #[component]
 fn App() -> Element {
     rsx! {
-        //document::Link { rel: "icon", href: FAVICON }
         document::Link { rel: "stylesheet", href: MAIN_CSS }
-        //Router::<Route> {}
+        document::Link { rel: "stylesheet", href: HOME_CSS }
+        document::Link { rel: "stylesheet", href: LIBRARY_CSS }
+        document::Link { rel: "stylesheet", href: DOWNLOAD_CSS }
+        document::Link { rel: "stylesheet", href: NOTIFICATION_CSS }
+        document::Link { rel: "stylesheet", href: CONTRIBUTE_CSS }
+        document::Link { rel: "stylesheet", href: UPLOAD_CSS }
+        Router::<Route> {}
     }
-}
-
-#[component]
-fn Navbar() -> Element {
-    rsx! {
-        nav { id: "navbar", class: "container",
-            a { href: "/", "Home" }
-            a { href: "/blog/1", "Blog 1" }
-            a { href: "/blog/2", "Blog 2" }
-        }
-    }
-}
-
-#[component]
-pub fn Hero() -> Element {
-    rsx! {}
 }

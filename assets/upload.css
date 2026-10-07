@@ -3,8 +3,8 @@
     box-sizing: border-box;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
     justify-self: center;
+    margin-top: 30px;
 
     width: 30%;
     height: max-content;
@@ -108,6 +108,7 @@
 }
 
 /* ============ Upload button ============ */
+#cancel_button,
 #upload_button {
     box-sizing: border-box;
     width: 100%;
@@ -116,18 +117,18 @@
 
     border: none;
     border-radius: 15px;
-    background-color: chartreuse;
     cursor: pointer;
     transition: transform 0.15s ease, filter 0.15s ease;
 }
 
-#upload_button:hover {
-    filter: brightness(0.5);
+#cancel_button {
+    color: red;
+    border: 2px solid red;
 }
 
-#upload_button:active {
-    transform: scale(0.96);
-    filter: brightness(0.9);
+#upload_button {
+    color: chartreuse;
+    border: 2px solid chartreuse;
 }
 
 #upload_input_title, #upload_input_abstract {

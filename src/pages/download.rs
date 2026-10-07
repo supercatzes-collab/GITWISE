@@ -1,70 +1,34 @@
-use dioxus::{html::{h1, ul}, prelude::*};
-//const FAVICON: Asset = asset!("/assets/favicon.ico");
-const MAIN_CSS: Asset = asset!("/assets/main.css");
-const DOWNLOAD_CSS: Asset = asset!("/assets/download.css");
-//const HEADER_SVG: Asset = asset!("/assets/header.svg");
-
-fn main() {
-    dioxus::launch(App);
-}
+use dioxus::prelude::*;
+use crate::components::ProfileCard;
+use crate::route::Route;
 
 #[component]
-fn App() -> Element {
-    rsx! {
-        //document::Link { rel: "icon", href: FAVICON }
-        document::Link { rel: "stylesheet", href: MAIN_CSS }
-        document::Link { rel: "stylesheet", href: DOWNLOAD_CSS }
-        //Router::<Route> {}
-        Navbar {}
-        Hero {}
-    }
-}
-
-#[component]
-fn Navbar() -> Element {
-    rsx! {
-        nav { id: "navbar", class: "container",
-            div { class: "nav_item", id: "nav_home", "home" }
-            div { class: "nav_item", id: "nav_library", "library" }
-            div { class: "nav_item", id: "nav_watching", "watching" }
-            div { class: "nav_item", id: "nav_settings", "settings" }
-        }
-    }
-}
-
-#[component]
-pub fn Hero() -> Element {
+pub fn Download() -> Element {
+    let nav = navigator();
     rsx! {
         div { class: "container", id: "mother_container",
-            div { class: "container", id: "profile_details_container",
-                div { class: "container", id: "profile_container",
-                    img {
-                        src: asset!("/assets/img_assets/profile.jpg"),
-                        id: "profile_img",
-                    }
+            ProfileCard {
+                button {
+                    class: "button",
+                    id: "view_profile_button",
+                    onclick: move |_| {
+                        nav.push(Route::Profile {});
+                    },
+                    "VIEW PROFILE"
                 }
 
-                div { class: "container", id: "profile_info_container",
-                    h1 { id: "profile_name", "Alan Turing" }
-                }
-
-                div { class: "container", id: "profile_info_sub_container",
-                    ul {
-                        id: "profile_info_ul",
-                        style: "list-style: none; margin: 0; padding: 0;",
-                        li { "Software Engineer" }
-                        li { "Mathematician" }
-                        li { "Cryptanalyst" }
-                    }
-                }
-
-                button { class: "button", id: "view_profile_button", "VIEW PROFILE" }
-
+                //convert this into component
                 div { class: "container", id: "info_container",
                     p { id: "upload_date",
                         span { class: "info_label", "Uploaded: " }
-                        span { class: "info_value", "1/18/1871 - 11/9/1918" }
+                        span { class: "info_value", "1/18/1871" }
                     }
+
+                    p { id: "update_date",
+                        span { class: "info_label", "Updated: " }
+                        span { class: "info_value", "5/05/1871" }
+                    }
+
                     p { id: "contributions_text",
                         span { class: "info_label", "Contributions: " }
                         span { class: "info_value", "420" }
@@ -72,6 +36,7 @@ pub fn Hero() -> Element {
                 }
             }
 
+            //convert this into component
             div { class: "container", id: "center_container",
                 h1 { id: "research_title",
                     "lorem ipsum dolor sit amet consectetur adipiscing elit velit libero temporibus occaecat commodo fugiat quis ducimus ipsum laboris excepteur qui fugiat et distinctio quibusdam quidem expedita"
@@ -93,51 +58,25 @@ pub fn Hero() -> Element {
                 button { class: "button", id: "download_button", "download file" }
             }
 
+            //convert into component
             div { class: "container", id: "details_container",
                 button { class: "stat_box", id: "stars", "STARS: 14k" }
                 button { class: "stat_box", id: "watching_label", "WATCHING: 14k" }
                 button { class: "stat_box", id: "downloads_label", "DOWNLOADS: 14k" }
 
-                button { class: "button", id: "contribute_button", "CONTRIBUTE" }
+                button {
+                    class: "button",
+                    id: "contribute_button",
+                    onclick: move |_| {
+                        nav.push(Route::Contribute {});
+                    },
+                    "CONTRIBUTE"
+                }
 
                 div { class: "container", id: "contributors_list",
                     h1 { id: "contributors_label", "CONTRIBUTORS: 4" }
-                    div { class: "contributors_card", id: "contributor_id",
-                        img {
-                            src: asset!("/assets/img_assets/profile.jpg"),
-                            class: "contributor_profile_img",
-                        }
-                        p {
-                            class: "contributor_name",
-                            id: "contributor_name_id",
-                            "Ada lovelace"
-                        }
-                    }
 
-                    div { class: "contributors_card", id: "contributor_id",
-                        img {
-                            src: asset!("/assets/img_assets/profile.jpg"),
-                            class: "contributor_profile_img",
-                        }
-                        p {
-                            class: "contributor_name",
-                            id: "contributor_name_id",
-                            "Ada lovelace"
-                        }
-                    }
-
-                    div { class: "contributors_card", id: "contributor_id",
-                        img {
-                            src: asset!("/assets/img_assets/profile.jpg"),
-                            class: "contributor_profile_img",
-                        }
-                        p {
-                            class: "contributor_name",
-                            id: "contributor_name_id",
-                            "Ada lovelace"
-                        }
-                    }
-
+                    //These are the placeholder cards for the actual contents. They should be built dynamically.
                     div { class: "contributors_card", id: "contributor_id",
                         img {
                             src: asset!("/assets/img_assets/profile.jpg"),
@@ -154,4 +93,3 @@ pub fn Hero() -> Element {
         }
     }
 }
-

@@ -1,8 +1,4 @@
 /* ============ Page layout shell ============ */
-#nav_library {
-    border-bottom: 1px solid var(--color-accent);
-}
-
 #mother_container {
     align-self: center;
     flex-direction: row;
@@ -176,13 +172,13 @@
     width: 100%;
     height: max-content;
     padding: 3%;
-    border: 2px solid chartreuse;
+    border: 2px solid var(--color-bg-raised);
 }
 
 #contributors_label {
     margin-bottom: 0;
     font-size: 1.2rem;
-    color: chartreuse;
+    color: var(--color-text)
 }
 
 .contributors_card {  
@@ -192,7 +188,7 @@
     width: 100%;
     height: max-content;
 
-    border-bottom: 2px solid chartreuse;
+    border-bottom: 2px solid var(--color-border-subtle);
     column-gap: 10px;
 }
 

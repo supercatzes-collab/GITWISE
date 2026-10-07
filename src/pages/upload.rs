@@ -1,49 +1,25 @@
-use dioxus::{html::{h1, ul}, prelude::*};
-//const FAVICON: Asset = asset!("/assets/favicon.ico");
-const MAIN_CSS: Asset = asset!("/assets/main.css");
-const UPLOAD_CSS: Asset = asset!("/assets/upload.css");
-//const HEADER_SVG: Asset = asset!("/assets/header.svg");
-
-fn main() {
-    dioxus::launch(App);
-}
+use dioxus::prelude::*;
+use crate::route::Route;
 
 #[component]
-fn App() -> Element {
-    rsx! {
-        //document::Link { rel: "icon", href: FAVICON }
-        document::Link { rel: "stylesheet", href: MAIN_CSS }
-        document::Link { rel: "stylesheet", href: UPLOAD_CSS }
-        //Router::<Route> {}
-        Navbar {}
-        Hero {}
-    }
-}
-
-#[component]
-fn Navbar() -> Element {
-    rsx! {
-        nav { id: "navbar", class: "container",
-            div { class: "nav_item", id: "nav_home", "home" }
-            div { class: "nav_item", id: "nav_library", "library" }
-            div { class: "nav_item", id: "nav_watching", "watching" }
-            div { class: "nav_item", id: "nav_settings", "settings" }
-        }
-    }
-}
-
-#[component]
-pub fn Hero() -> Element {
+pub fn Upload() -> Element {
+    let nav = navigator();
     rsx! {
         div { class: "container", id: "upload_mother_container",
             div { id: "upload_title",
                 h1 { id: "upload_research_title", "RESEARCH TITLE" }
-                textarea { id: "upload_input_title" }
+                textarea {
+                    id: "upload_input_title",
+                    placeholder: "Enter your research title here",
+                }
             }
 
             div { id: "upload_abstract",
                 h1 { id: "upload_header_abstract", "ABSTRACT" }
-                textarea { id: "upload_input_abstract" }
+                textarea {
+                    id: "upload_input_abstract",
+                    placeholder: "Enter your research abstract here ",
+                }
             }
 
             FileDropzone {
@@ -71,7 +47,7 @@ pub fn Hero() -> Element {
                 header_id: "upload_header_zipfile",
                 input_id: "upload_input_zipfile",
                 label: "UPLOAD ZIP",
-                accept: ".zip",
+                accept: "folder/*",
                 icon: rsx! {
                     path { d: "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" }
                     polyline { points: "17 8 12 3 7 8" }
@@ -84,7 +60,24 @@ pub fn Hero() -> Element {
                 },
             }
 
-            button { class: "button", id: "upload_button", "UPLOAD" }
+            //Change this to route to home.rs && call the function that will handle the upload of the research title, abstract, image, and zip file to the database.
+            button {
+                class: "button",
+                id: "upload_button",
+                //to do: send user back to home then builds the item
+                onclick: move |_| {
+                    nav.push(Route::Home {});
+                },
+                "UPLOAD"
+            }
+            button {
+                class: "button",
+                id: "cancel_button",
+                onclick: move |_| {
+                    nav.push(Route::Home {});
+                },
+                "CANCEL"
+            }
         }
     }
 }
@@ -115,17 +108,6 @@ fn FileDropzone(
                 }
                 input { id: input_id, r#type: "file", accept }
             }
-        }
-    }
-}
-
-//function to build the contents object
-#[component]
-fn WorkItem(id: String, img_src: Asset, title: String) -> Element {
-    rsx! {
-        div { class: "works_item", id: "{id}",
-            img { src: img_src, class: "content_img" }
-            h1 { class: "content_title", "{title}" }
         }
     }
 }

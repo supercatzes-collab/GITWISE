@@ -1,0 +1,15 @@
+
+#main_container {
+    flex-direction: column;
+    width: 30vw;
+    height: 90vh;
+
+    border: 10px solid var(--color-bg);
+    justify-self: center;
+}
+
+#contribute_header {
+    flex-direction: column;
+    width: 100%;   
+
+}
