@@ -42,9 +42,9 @@
     box-sizing: border-box;
     width: 100%;
 
+    background-color: var(--color-surface);
     border: solid var(--color-border);
     border-radius: 10px;
-    background-color: #3a3a3d;
     outline: none;
     transition: transform 0.15s ease, filter 0.15s ease;
 }
@@ -57,10 +57,12 @@
 #upload_input_abstract {
     height: 100px;
     resize: vertical;
+    font-size: 1rem;
 }
 
 #upload_input_title {
     resize: vertical;
+    font-size: 1rem;
 }
 
 #upload_input_image, #upload_input_zipfile {

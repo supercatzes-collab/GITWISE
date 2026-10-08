@@ -1,5 +1,6 @@
 use dioxus::prelude::*;
 use crate::route::Route;
+use crate::pages::outgoing_requests::State;
 
 #[component]
 pub fn ProfileCard(children: Element) -> Element {
@@ -77,6 +78,7 @@ pub fn PendingUpdates(
     on_dismiss: EventHandler<String>,
 ) -> Element {
     let nav = navigator();
+    
     rsx! {
         div { class: "notification_content_request", id: "{id}",
             //author header div
@@ -113,6 +115,47 @@ pub fn PendingUpdates(
                     onclick: move |_| on_dismiss.call(id.clone()),
                     "dismiss"
                 }
+            }
+        }
+    }
+}
+
+#[component]
+pub fn OutgoingUpdates( 
+    id: String,
+    img_src: Asset,
+    title: String,
+    author: String,
+    status: State,
+    on_dismiss: EventHandler<String>,
+) -> Element {
+    let nav = navigator();
+
+    let status_class = match status {
+        State::Pending => "status_pending",
+        State::Accepted => "status_accepted",
+        State::Rejected => "status_rejected",
+    };
+
+    rsx! {
+        div { class: "notification_content {status_class}", id: "{id}",
+            img { src: img_src, id: "thumbnail_img_notif" }
+
+            h1 { class: "content_title", "{title}" }
+
+            button {
+                class: "button",
+                id: "view_button",
+                onclick: move |_| {
+                    nav.push(Route::Download {});
+                },
+                "view"
+            }
+            button {
+                class: "button",
+                id: "dismiss_button",
+                onclick: move |_| on_dismiss.call(id.clone()),
+                "dismiss"
             }
         }
     }

@@ -9,7 +9,7 @@ pub fn Navbar() -> Element {
 
     let home_active = route == Route::Home {};
     let library_active = route == Route::Library {};
-
+    let settings_active = route == Route::Settings {};
     rsx! {
         nav { id: "navbar", class: "container",
             button {
@@ -28,13 +28,14 @@ pub fn Navbar() -> Element {
                 },
                 "library"
             }
-            button { class: "nav_item", id: "nav_settings",
-                //onclick: move |_| {
-                //    nav.push(Route::Settings {});
-                //},
+            button {
+                class: if settings_active { "nav_item active" } else { "nav_item" },
+                id: "nav_settings",
+                onclick: move |_| {
+                    nav.push(Route::Settings {});
+                },
                 "settings"
             }
-        
         }
         Outlet::<Route> {}
     }

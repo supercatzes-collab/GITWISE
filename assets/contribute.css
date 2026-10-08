@@ -1,15 +1,138 @@
-
 #main_container {
-    flex-direction: column;
-    width: 30vw;
+    width: 100vw;
     height: 90vh;
 
-    border: 10px solid var(--color-bg);
-    justify-self: center;
-}
-
-#contribute_header {
     flex-direction: column;
-    width: 100%;   
-
+    padding: 1%;
 }
+
+#secondary_main_container {
+    flex-direction: row;
+    width: 100%;
+    height: 100%;
+    column-gap: 1%;
+}
+
+#header {
+    width: 100%;
+    height: 80px;
+    flex-direction: column;
+    align-items: baseline;
+    gap: 0;
+}
+
+#left_inner_container, #right_inner_container {
+    width: 100%;
+    height: 100%;
+
+    border-radius: 2%;
+    border: 1px solid var(--color-bg-raised);
+    flex-direction: column;
+}
+
+#left_inner_container {
+    padding: 1%;
+    overflow-y: auto;
+    min-height: 0;
+    row-gap: 0;
+}
+
+#left_inner_header {
+    color: var(--color-bg-raised);
+    margin: 0;
+}
+
+.file_cards {
+    box-sizing: border-box;
+    width: 100%;
+    height: max-content;
+    
+    padding-bottom: 0.5%;
+    margin: 0;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    transition: background-color 0.15s ease;
+}
+
+.file_cards:hover,
+.file_cards.selected {
+    background-color: var(--color-border-subtle);
+}
+
+.page_text, .page_text2, .page_text3 {
+    font-size: 1.5rem;
+}
+
+.page_text, .page_text3 {
+    color: var(--color-bg-raised);
+}
+
+.page_text2 {
+    color: var(--color-text);
+}
+
+.page_text3 {
+    margin-left: auto;
+}
+
+#right_inner_container {
+    padding: 1%;
+    flex-direction: column;   
+}
+
+#right_inner_header {
+    flex-direction: column;
+}
+
+.page_text4, .page_text5, .page_text6, .page_text7, #right_inner_header_text, #right_inner_header_title, #details {
+    margin: 0;
+}
+
+.page_text4, .page_text5, .page_text6, .page_text7, #right_inner_header_text, #right_inner_header_text2,  #details {
+    color: var(--color-bg-raised);
+}
+
+#text_area {
+    border-radius: 5px;
+    height: 40%;
+    background-color: var( --color-surface);
+    border-color: var(--color-bg-raised);
+    color: var(--color-text);
+    font-size: 1rem;
+    resize: vertical;
+}
+
+#header_text {
+    font-size: 1rem;
+    margin: 0;
+    color: var(--color-bg-raised);
+}
+
+#header_title {
+    font-size: 2rem;
+    margin: 0;
+}
+
+#details {
+    margin-bottom: 20px;
+}
+
+#upload_contribution_btn, #cancel_contribution_btn {
+    height: 50px;
+    margin-top: 20px;
+    border-radius: 5px;
+}
+
+#upload_contribution_btn {
+    border-color: chartreuse;
+    color: chartreuse;
+}
+
+#cancel_contribution_btn {
+    border-color:red;
+    color: red;
+}
+
+
+

@@ -1,0 +1,50 @@
+#settings_main_container {
+    justify-self: center;
+
+    margin-top: 5%;
+    width: 600px;
+    height: max-content;
+    border: 2px solid var(--color-bg-raised);
+    flex-direction: column;
+
+    border-radius: 5px;
+    padding: 1%;
+}
+
+#settings_secondary_container {
+    flex-direction: row;
+    width: 100%;
+    height: 40%;
+}
+
+#settings_details_container {
+    flex: 1;
+    min-width: 0;
+    height: 150px;
+    margin-left: 10px;
+    flex-direction: column;
+}
+
+#settings_profile_img {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    object-fit: cover;
+}
+
+#settings_username {
+    margin-bottom: 0;
+} 
+
+#settings_account_creation {
+    margin: 0;
+    color: var(--color-bg-raised)
+}
+
+#logout_btn {
+    margin-top: 5%;
+    height: 50px;
+    color: red;
+    border-color: red;
+}

@@ -28,6 +28,16 @@ pub fn Home() -> Element {
                     //needs to be swapped for a dynmic value
                     "WATCHING UPDATES: 67"
                 }
+
+                button {
+                    class: "button",
+                    id: "outgoing_button",
+                    onclick: move |_| {
+                        nav.push(Route::Outgoing {});
+                    },
+                    //needs to be swapped for a dynmic value
+                    "OUTGOING REQUESTS: 67"
+                }
             }
 
             div { class: "container", id: "center_works_container",

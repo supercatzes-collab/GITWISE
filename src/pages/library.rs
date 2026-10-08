@@ -17,18 +17,27 @@ pub fn Library() -> Element {
                     onclick: move |_| {
                         nav.push(Route::Pending {});
                     },
-                    //needs to be swapped for a dynamic value
+                    //needs to be swapped for a dynmic value
                     "SEE EDIT REQUESTS: 67"
                 }
-
                 button {
                     class: "button",
                     id: "watching_button",
                     onclick: move |_| {
                         nav.push(Route::Watching {});
                     },
-                    //needs to be swapped for a dynamic value
+                    //needs to be swapped for a dynmic value
                     "WATCHING UPDATES: 67"
+                }
+
+                button {
+                    class: "button",
+                    id: "outgoing_button",
+                    onclick: move |_| {
+                        nav.push(Route::Outgoing {});
+                    },
+                    //needs to be swapped for a dynmic value
+                    "OUTGOING REQUESTS: 67"
                 }
             }
 

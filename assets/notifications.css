@@ -142,3 +142,15 @@
 
     border-radius: 5px;
 }
+
+.status_pending {
+    border-color: goldenrod;
+}
+
+.status_accepted {
+    border-color: green;
+}
+
+.status_rejected {
+    border-color: red;
+}

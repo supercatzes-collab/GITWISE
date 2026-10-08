@@ -6,6 +6,8 @@ mod pending;
 mod profile;
 mod contribute;
 mod upload;
+pub mod outgoing_requests;
+mod logout;
 
 pub use home::Home;
 pub use library::Library;
@@ -15,3 +17,5 @@ pub use pending::Pending;
 pub use profile::Profile;
 pub use contribute::Contribute;
 pub use upload::Upload;
+pub use outgoing_requests::Outgoing;
+pub use logout::Settings;

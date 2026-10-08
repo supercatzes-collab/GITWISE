@@ -194,7 +194,7 @@ body {
     filter: brightness(0.9);
 }
 
-#request_button, #watching_button {
+#request_button, #watching_button, #outgoing_button {
     border: 2px solid var(--color-bg-raised);
     width: 250px;
     height: 50px;

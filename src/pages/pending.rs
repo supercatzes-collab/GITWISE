@@ -12,7 +12,6 @@ struct PendingItem {
 
 #[component]
 pub fn Pending() -> Element {
-    let nav = navigator();
     let mut pending = use_signal(|| {
         vec![
             PendingItem {
@@ -24,6 +23,7 @@ pub fn Pending() -> Element {
         ]
     });
 
+    let nav = navigator();
     rsx! {
         div { class: "container", id: "mother_container",
             ProfileCard {
@@ -33,6 +33,7 @@ pub fn Pending() -> Element {
                     onclick: move |_| {
                         nav.push(Route::Pending {});
                     },
+                    //needs to be swapped for a dynmic value
                     "SEE EDIT REQUESTS: 67"
                 }
                 button {
@@ -41,7 +42,18 @@ pub fn Pending() -> Element {
                     onclick: move |_| {
                         nav.push(Route::Watching {});
                     },
+                    //needs to be swapped for a dynmic value
                     "WATCHING UPDATES: 67"
+                }
+
+                button {
+                    class: "button",
+                    id: "outgoing_button",
+                    onclick: move |_| {
+                        nav.push(Route::Outgoing {});
+                    },
+                    //needs to be swapped for a dynmic value
+                    "OUTGOING REQUESTS: 67"
                 }
             }
 
