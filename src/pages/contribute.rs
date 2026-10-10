@@ -1,5 +1,9 @@
 use dioxus::prelude::*;
+use crate::components::general_components::*;
 //use crate::route::Route;
+
+//Note each individual right hand component should be unique to the file slected. So it must be a component too.
+
 
 #[component] 
 pub fn Contribute() -> Element {
@@ -15,46 +19,32 @@ pub fn Contribute() -> Element {
                 div { class: "container", id: "secondary_main_container",
                     div { class: "container", id: "left_inner_container",
                         p { id: "left_inner_header", "Choose a file to replace:" }
-                        p { class: "file_cards", id: "page_id",
-                            span { class: "page_text", "GITWISE" }
-                            span { class: "page_text2", "/chapter1.docx" }
-                            span { class: "page_text3", "8KB" }
+                        //Needs to replaced by an SQL fetch
+                        FileItem {
+                            title: "GITWISE",
+                            selected_file: "chapter1.docx",
+                            file_size: 10,
                         }
-                        p { class: "file_cards", id: "page_id",
-                            span { class: "page_text", "GITWISE" }
-                            span { class: "page_text2", "/chapter2.docx" }
-                            span { class: "page_text3", "8KB" }
-                        }
-                        p { class: "file_cards", id: "page_id",
-                            span { class: "page_text", "GITWISE" }
-                            span { class: "page_text2", "/chapter3.docx" }
-                            span { class: "page_text3", "8KB" }
-                        }
-                        p { class: "file_cards", id: "page_id",
-                            span { class: "page_text", "GITWISE" }
-                            span { class: "page_text2", "/chapter4.docx" }
-                            span { class: "page_text3", "8KB" }
-                        }
-                        p { class: "file_cards", id: "page_id",
-                            span { class: "page_text", "GITWISE" }
-                            span { class: "page_text2", "/chapter5.docx" }
-                            span { class: "page_text3", "8KB" }
-                        }
-                    
                     }
 
                     div { class: "container", id: "right_inner_container",
+                        //Needs to be replaced with a component function
                         div { class: "container", id: "right_inner_header",
-                            p { id: "right_inner_header_text", "Replacing: " }
-                            h1 { id: "right_inner_header_title", "parent/file.docx" }
-                            p { id: "details",
-                                span { class: "page_text4", "v1.2.3 ^ " }
-                                span { class: "page_text5", "48KB ^ " }
-                                span { class: "page_text6", "updated: " }
-                                span { class: "page_text7", "5/05/26" }
+                            p {
+                                id: "right_inner_header_text",
+                                class: "page_sub_text",
+                                "Replacing: "
+                            }
+                            //Needs to replaced by an SQL fetch
+                            SelectedFileItemDetails {
+                                selected_file: "parent",
+                                version: "v1.2.3",
+                                file_size: 18,
+                                update: "5/05/26",
                             }
                         }
 
+                        //Needs to made database compatible, not sure how to do this part yet.
                         FileDropzone {
                             wrapper_id: "upload_zipfile",
                             header_id: "upload_header_zipfile",
@@ -72,7 +62,12 @@ pub fn Contribute() -> Element {
                                 }
                             },
                         }
-                        p { id: "right_inner_header_text2", "Describe what changed" }
+
+                        p {
+                            id: "right_inner_header_text2",
+                            class: "page_sub_text",
+                            "Describe what changed"
+                        }
                         textarea { id: "text_area", placeholder: "Insert text here" }
                         button { class: "button", id: "upload_contribution_btn", "SUBMIT EDIT REQUEST" }
                         button { class: "button", id: "cancel_contribution_btn", "CANCEL" }
@@ -83,6 +78,8 @@ pub fn Contribute() -> Element {
     }
 }
 
+
+//Needs to be moved to data.rs file
 #[component]
 fn FileDropzone(
     wrapper_id: &'static str,

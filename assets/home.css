@@ -3,8 +3,8 @@
 #mother_container {
     align-self: center;
     flex-direction: row;
-    width: 100%;
-    height: max-content;
+    width: 100vw;
+    height: 100vh;
 
     border: 10px solid var(--color-bg);
     border-right: none;
@@ -41,9 +41,22 @@
 }
 
 #contents_container {
-    align-self: center;
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 50px;
-    height: max-content;
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-bg-raised) transparent;
+}
+
+#contents_container::-webkit-scrollbar {
+    width: 6px;
+}
+
+#contents_container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+#contents_container::-webkit-scrollbar-thumb {
+    background-color: var(--color-bg-raised);
+    border-radius: 3px;
 }

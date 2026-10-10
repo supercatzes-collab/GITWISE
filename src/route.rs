@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 
 use crate::navbar::Navbar;
-use crate::pages::{Home, Library, Download, Watching, Pending, Profile, Contribute, Upload, Outgoing, Settings};
+use crate::pages::{Home, Library, Download, Watching, Pending, Profile, Contribute, Upload, Outgoing, Settings, Login, Signin, IncomingRequest};
 
 #[derive(Routable, Clone, PartialEq)]
 pub enum Route {
@@ -26,4 +26,10 @@ pub enum Route {
     Outgoing {},
     #[route("/logout")]
     Settings {},
+    #[route("/login")]
+    Login {},
+    #[route("/signin")]
+    Signin,
+    #[route("/view_incoming_request")]
+    IncomingRequest,
 }

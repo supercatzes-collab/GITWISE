@@ -8,6 +8,9 @@ mod contribute;
 mod upload;
 pub mod outgoing_requests;
 mod logout;
+mod login;
+mod signin;
+mod view_incoming_request;
 
 pub use home::Home;
 pub use library::Library;
@@ -19,3 +22,6 @@ pub use contribute::Contribute;
 pub use upload::Upload;
 pub use outgoing_requests::Outgoing;
 pub use logout::Settings;
+pub use login::Login;
+pub use signin::Signin;
+pub use view_incoming_request::IncomingRequest;

@@ -35,6 +35,101 @@ pub fn ProfileCard(children: Element) -> Element {
     }
 }
 
+//TO DO:
+#[component]
+pub fn StatsBtns (
+    stars: usize,
+    watching: usize,
+    downloads: usize,
+) -> Element {
+    rsx! {
+        button { class: "stat_box", id: "stars", "STARS: {stars}" }
+        button { class: "stat_box", id: "watching_label", "WATCHING: {watching}" }
+        button { class: "stat_box", id: "downloads_label", "DOWNLOADS: {downloads}" }
+    }
+}
+
+#[component]
+pub fn CenterDetails(
+    title: String,
+    version: String,
+    thumbnail: Asset,
+    abstrakt: String,
+) -> Element {
+    rsx! {
+        h1 { id: "research_title", "{title}" }
+        div { class: "tag", id: "version_tag", "{version}" }
+        img { src: thumbnail, id: "thumbnail_img" }
+        h2 { id: "abstract_label", "ABSTRACT" }
+        p { id: "abstract_body", "{abstrakt}" }
+        button { class: "button", id: "download_button", "download file" }
+    }
+}
+
+#[component] 
+pub fn ItemDetails(
+    upload_date: String,
+    update_date: String,
+    count: usize,
+) -> Element {
+    rsx! {
+        div { class: "container", id: "info_container",
+            p { id: "upload_date",
+                span { class: "info_label", "Uploaded: " }
+                span { class: "info_value", "{upload_date}" }
+            }
+
+            p { id: "update_date",
+                span { class: "info_label", "Updated: " }
+                span { class: "info_value", "{update_date}" }
+            }
+
+            p { id: "contributions_text",
+                span { class: "info_label", "Contributions: " }
+                span { class: "info_value", "{count}" }
+            }
+        }
+    }
+}
+
+#[component]
+pub fn ProfileActions(
+    pending_count: usize,
+    watching_count: usize,
+    outgoing_count: usize,
+) -> Element {
+    let nav = navigator();
+    rsx! {
+        button {
+            class: "button",
+            id: "request_button",
+            onclick: move |_| {
+                nav.push(Route::Pending {});
+            },
+            //needs to be swapped for a dynmic value
+            "SEE EDIT REQUESTS: {pending_count}"
+        }
+        button {
+            class: "button",
+            id: "watching_button",
+            onclick: move |_| {
+                nav.push(Route::Watching {});
+            },
+            //needs to be swapped for a dynmic value
+            "WATCHING UPDATES: {watching_count}"
+        }
+        button {
+            class: "button",
+            id: "outgoing_button",
+            onclick: move |_| {
+                nav.push(Route::Outgoing {});
+            },
+            //needs to be swapped for a dynmic value
+            "OUTGOING REQUESTS: {outgoing_count}"
+        }
+    }
+}
+
 #[component]
 pub fn WatchingUpdates( 
     id: String,
@@ -63,6 +158,38 @@ pub fn WatchingUpdates(
                 id: "dismiss_button",
                 onclick: move |_| on_dismiss.call(id.clone()),
                 "dismiss"
+            }
+        }
+    }
+}
+
+#[component]
+pub fn WorkItem(id: String, 
+    img_src: Asset, 
+    title: String, 
+    author: String, 
+    date: String, 
+    thumbnail: Asset,
+) -> Element {
+    let nav = navigator();
+
+    rsx! {
+        div {
+            class: "works_item",
+            id: "{id}",
+            onclick: move |_| {
+                nav.push(Route::Download {});
+            },
+            img { src: thumbnail, class: "content_img" }
+            h1 { class: "content_title", "{title}" }
+            div { class: "content_author", id: "content_author_id_{id}",
+                img { src: img_src, class: "content_profile" }
+                h1 {
+                    class: "content_author_class_text",
+                    id: "content_author_id_text_{id}",
+                    "{author}"
+                }
+                h1 { class: "content_date_class", id: "content_date_id_{id}", " | {date}" }
             }
         }
     }
@@ -105,7 +232,7 @@ pub fn PendingUpdates(
                     class: "button",
                     id: "view_button",
                     onclick: move |_| {
-                        nav.push(Route::Download {});
+                        nav.push(Route::IncomingRequest {});
                     },
                     "view"
                 }
@@ -157,6 +284,55 @@ pub fn OutgoingUpdates(
                 onclick: move |_| on_dismiss.call(id.clone()),
                 "dismiss"
             }
+        }
+    }
+}
+
+#[component]
+pub fn FileItem(
+    title: String,
+    selected_file: String,
+    file_size: usize,
+) -> Element {
+    rsx! {
+        p { class: "file_cards", id: "page_id",
+            span { id: "details_text_1", class: "page_sub_text", "{title}" }
+            span { id: "details_text_2", class: "page_sub_text", "/{selected_file}" }
+            span { id: "details_text_3", class: "page_sub_text", "{file_size}KB" }
+        }
+    }
+}
+
+//needs to be modified to get entire file path.
+#[component] 
+pub fn SelectedFileItemDetails(
+    selected_file: String,
+    version: String,
+    file_size: usize,
+    update: String,
+) -> Element {
+    rsx! {
+        h1 { id: "right_inner_header_title", "{selected_file}" }
+        p { id: "details",
+            span { id: "details_text_4", class: "page_sub_text", "{version} ^ " }
+            span { id: "details_text_5", class: "page_sub_text", "{file_size}KB ^ " }
+            span { id: "details_text_6", class: "page_sub_text", "updated: " }
+            span { id: "details_text_7", class: "page_sub_text", "{update}" }
+        }
+    }
+}
+
+#[component]
+pub fn ContributorsProfileList(
+    count: usize,
+    profile_img: Asset,
+    name: String,
+) -> Element {
+    rsx! {
+        h1 { id: "contributors_label", "CONTRIBUTORS: {count}" }
+        div { class: "contributors_card", id: "contributor_id",
+            img { src: profile_img, class: "contributor_profile_img" }
+            p { class: "contributor_name", id: "contributor_name_id", "{name}" }
         }
     }
 }

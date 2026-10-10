@@ -19,7 +19,15 @@ pub fn Settings() -> Element {
                     }
                 }
             }
-            button { class: "button", id: "logout_btn", "LOG OUT" }
+            // ...existing code...
+            button {
+                class: "button",
+                id: "logout_btn",
+                onclick: move |_| {
+                    nav.push(Route::Login {});
+                },
+                "LOG OUT"
+            }
         }
     }
 }

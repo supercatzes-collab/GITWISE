@@ -1,44 +1,14 @@
 use dioxus::prelude::*;
-
-use crate::components::ProfileCard;
-use crate::components::WorkItem;
-use crate::route::Route;
+use crate::components::general_components::*;
 
 #[component]
 pub fn Library() -> Element {
-    let nav = navigator();
     rsx! {
         div { class: "container", id: "mother_container",
 
             ProfileCard {
-                button {
-                    class: "button",
-                    id: "request_button",
-                    onclick: move |_| {
-                        nav.push(Route::Pending {});
-                    },
-                    //needs to be swapped for a dynmic value
-                    "SEE EDIT REQUESTS: 67"
-                }
-                button {
-                    class: "button",
-                    id: "watching_button",
-                    onclick: move |_| {
-                        nav.push(Route::Watching {});
-                    },
-                    //needs to be swapped for a dynmic value
-                    "WATCHING UPDATES: 67"
-                }
-
-                button {
-                    class: "button",
-                    id: "outgoing_button",
-                    onclick: move |_| {
-                        nav.push(Route::Outgoing {});
-                    },
-                    //needs to be swapped for a dynmic value
-                    "OUTGOING REQUESTS: 67"
-                }
+                //this is supposed to take in data from the database.
+                ProfileActions { pending_count: 2, watching_count: 1, outgoing_count: 0 }
             }
 
             div { class: "container", id: "center_works_container",
@@ -52,9 +22,11 @@ pub fn Library() -> Element {
                 }
 
                 div { class: "container", id: "contents_container",
+                    //this is supposed to take in data from the database.
                     WorkItem {
                         id: "work_1",
-                        img_src: asset!("/assets/img_assets/thumbnail.jpg"),
+                        img_src: asset!("/assets/img_assets/profile.jpg"),
+                        thumbnail: asset!("/assets/img_assets/thumbnail.jpg"),
                         title: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore",
                         author: "ludwig von mises",
                         date: "09/25/26",

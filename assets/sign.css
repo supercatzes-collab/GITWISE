@@ -1,0 +1,92 @@
+
+#login_main_container, #sign_main_container {
+    justify-self: center;
+    width: 600px;
+    height: max-content;
+
+    flex-direction: column;
+    border: 2px solid var(--color-bg-raised);
+    border-radius: 20px;
+    padding: 1%;
+    margin-top: 5%;
+}
+
+#login_header_text {
+    color: var(--text-color)
+}
+
+.login_text {
+    margin-bottom: 0;
+    color: var(--color-bg-raised);
+}
+
+#login_password_field {
+    margin-bottom: 25px;
+}
+
+#login_btn, #signin_btn {
+    height: 50px;
+    border: 2px solid var(--color-bg-raised);
+    margin-top: 5px;
+}
+
+#login_btn {
+    border-color: chartreuse;
+    color: chartreuse;
+}
+
+#signin_btn {
+    color: var(--color-bg-raised);
+}
+
+.login_input {
+    height: 50px;
+    background-color: var(--color-surface);
+    margin-top: 5px;
+    border: 2px solid var(--color-bg-raised);
+    color: var(--text-color);
+}
+
+.login_input::-ms-reveal {
+    filter: invert(1);
+}
+
+#login_text1 {
+    margin-top: 0;
+}
+
+#profile_container {
+    flex-direction: row;
+    column-gap: 20px;
+}
+
+#sign_profile {
+    width: 100px;
+    height: 100px;
+
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+#profile_title {
+    margin: 0;
+}
+
+#profile_text0 {
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+#profile_text1 {
+    margin: 0;
+}
+
+#sign_title {
+    color: var(--text-color)
+}
+
+#profile_details {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
