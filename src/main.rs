@@ -1,12 +1,12 @@
 use dioxus::prelude::*;
 
-mod components;
-mod navbar;
-mod pages;
-mod route;
+pub mod components;
+pub mod navbar;
+pub mod pages;
+pub mod route;
+
 
 use route::Route;
-//use crate::components::WorkItem;
 
 fn main() {
     dioxus::launch(App);

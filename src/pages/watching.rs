@@ -1,6 +1,5 @@
 use dioxus::prelude::*;
 use crate::components::*;
-use crate::route::Route;
 
 #[derive(Clone, PartialEq)]
 struct WatchingItem {
@@ -24,38 +23,11 @@ pub fn Watching() -> Element {
         ]
     });
 
-    let nav = navigator();
     rsx! {
         div { class: "container", id: "mother_container",
             ProfileCard {
-                button {
-                    class: "button",
-                    id: "request_button",
-                    onclick: move |_| {
-                        nav.push(Route::Pending {});
-                    },
-                    //needs to be swapped for a dynmic value
-                    "SEE EDIT REQUESTS: 67"
-                }
-                button {
-                    class: "button",
-                    id: "watching_button",
-                    onclick: move |_| {
-                        nav.push(Route::Watching {});
-                    },
-                    //needs to be swapped for a dynmic value
-                    "WATCHING UPDATES: 67"
-                }
-
-                button {
-                    class: "button",
-                    id: "outgoing_button",
-                    onclick: move |_| {
-                        nav.push(Route::Outgoing {});
-                    },
-                    //needs to be swapped for a dynmic value
-                    "OUTGOING REQUESTS: 67"
-                }
+                //replace this with sql fetches
+                ProfileActions { pending_count: 2, watching_count: 1, outgoing_count: 0 }
             }
 
             div { class: "container", id: "right_container",

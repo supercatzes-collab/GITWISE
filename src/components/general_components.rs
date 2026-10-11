@@ -1,7 +1,9 @@
 use dioxus::prelude::*;
 use crate::route::Route;
-use crate::pages::outgoing_requests::State;
+use crate::components::*;
 
+
+//components needs to be edited.
 #[component]
 pub fn ProfileCard(children: Element) -> Element {
     rsx! {
@@ -35,9 +37,8 @@ pub fn ProfileCard(children: Element) -> Element {
     }
 }
 
-//TO DO:
 #[component]
-pub fn StatsBtns (
+pub fn StatsBtns(
     stars: usize,
     watching: usize,
     downloads: usize,
@@ -333,6 +334,83 @@ pub fn ContributorsProfileList(
         div { class: "contributors_card", id: "contributor_id",
             img { src: profile_img, class: "contributor_profile_img" }
             p { class: "contributor_name", id: "contributor_name_id", "{name}" }
+        }
+    }
+}
+
+#[component]
+pub fn LogoutProfile(
+    profile_img: Asset,
+    username: String,
+    date_created: String,
+) -> Element {
+    rsx! {
+        img { id: "settings_profile_img", src: profile_img }
+        div { class: "container", id: "settings_details_container",
+            h1 { id: "settings_username", "{username}" }
+            p { id: "settings_account_creation",
+                span { id: "settings_text", "Account created: " }
+                span { id: "settings_date", "{date_created}" }
+            }
+        }
+    }
+}
+
+#[component]
+pub fn ImageInput(
+    img_id: &'static str,
+    input_id: &'static str,
+    img_src: Asset,
+    on_select: EventHandler<String>,
+) -> Element {
+    rsx! {
+        label { r#for: input_id,
+            img { id: img_id, src: img_src }
+        }
+        input {
+            id: input_id,
+            r#type: "file",
+            accept: "image/*",
+            hidden: true,
+            onchange: move |evt| {
+                if let Some(file) = evt.files().first() {
+                    on_select.call(file.path().to_string_lossy().to_string());
+                }
+            },
+        }
+    }
+}
+
+#[component]
+pub fn FormField(
+    label_id: &'static str,
+    label: &'static str,
+    input_id: &'static str,
+    placeholder: &'static str,
+    input_type: Option<&'static str>,
+    on_input: EventHandler<String>,
+) -> Element {
+    rsx! {
+        p { class: "login_text", id: label_id, "{label}" }
+        input {
+            class: "login_input",
+            r#type: input_type,
+            id: input_id,
+            placeholder,
+            oninput: move |evt| on_input.call(evt.value()),
+        }
+    }
+}
+
+#[component]
+pub fn CredentialList(items: Vec<String>) -> Element {
+    rsx! {
+        ul {
+            id: "profile_info_ul",
+            style: "list-style: none; margin: 0; padding: 0;",
+            for (i , item) in items.iter().enumerate() {
+                li { key: "{i}", "{item}" }
+            }
         }
     }
 }

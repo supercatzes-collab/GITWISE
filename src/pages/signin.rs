@@ -1,9 +1,13 @@
 use crate::route::Route;
 use dioxus::prelude::*;
+use crate::components::*;
 
 #[component]
 pub fn Signin() -> Element {
     let nav  = navigator();
+    let mut profile_path = use_signal(String::new);
+    let mut username = use_signal(String::new);
+    let mut password = use_signal(String::new);
     rsx! {
         div { class: "container", id: "sign_main_container",
             h1 { class: "login_text", id: "sign_title", "SIGN IN" }
@@ -11,27 +15,32 @@ pub fn Signin() -> Element {
                 "Share and contribute to open-source research"
             }
             div { class: "container", id: "profile_container",
-                img {
-                    id: "sign_profile",
-                    src: asset!("/assets/img_assets/profile.jpg"),
+                ImageInput {
+                    img_id: "sign_profile",
+                    input_id: "sign_profile_input",
+                    img_src: asset!("/assets/img_assets/profile.jpg"),
+                    on_select: move |path: String| profile_path.set(path),
                 }
                 span { id: "profile_details",
                     h2 { id: "profile_title", "Profile picture" }
                     p { class: "login_text", id: "profile_text1", "Choose an image" }
                 }
             }
-            p { class: "login_text", id: "profile_text2", "Display name" }
-            input {
-                class: "login_input",
-                id: "sign_username_field",
+
+            FormField {
+                label_id: "profile_text2",
+                label: "Username",
+                input_id: "sign_username_field",
                 placeholder: "Insert username here.",
+                on_input: move |text: String| username.set(text),
             }
-            p { class: "login_text", id: "profile_text3", "Password" }
-            input {
-                class: "login_input",
-                r#type: "password",
-                id: "sign_password_field",
+            FormField {
+                label_id: "profile_text3",
+                label: "Password",
+                input_id: "sign_password_field",
+                input_type: "password",
                 placeholder: "Insert password here.",
+                on_input: move |text: String| password.set(text),
             }
 
             button {

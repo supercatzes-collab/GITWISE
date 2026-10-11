@@ -1,24 +1,18 @@
 use dioxus::prelude::*;
 use crate::components::*;
-use crate::route::Route;
 
-#[derive(Clone, PartialEq)]
-struct PendingItem {
-    id: String,
-    title: String,
-    author: String,
-    author_img_src: Asset,
-}
 
 #[component]
 pub fn Pending() -> Element {
     let mut pending = use_signal(|| {
         vec![
+            //replace this with sql fetches
             PendingItem {
                 id: "pending_1".into(),
                 title: "lorem ipsum dolor sit amet consectetur adipiscing elit velit libero temporibus occaecat occaecat occaecat occaecat".into(),
                 author: "Ada Lovelace".into(),
                 author_img_src: asset!("/assets/img_assets/profile.jpg"),
+                thumbnail_src: asset!("/assets/img_assets/thumbnail.jpg"),
             },
         ]
     });
@@ -37,7 +31,7 @@ pub fn Pending() -> Element {
                     PendingUpdates {
                         key: "{item.id}",
                         id: item.id.clone(),
-                        img_src: asset!("/assets/img_assets/thumbnail.jpg"),
+                        img_src: item.thumbnail_src,
                         title: item.title.clone(),
                         author: item.author.clone(),
                         author_img_src: item.author_img_src,

@@ -11,6 +11,7 @@ pub fn Library() -> Element {
                 ProfileActions { pending_count: 2, watching_count: 1, outgoing_count: 0 }
             }
 
+            //Needs to become a search funtion
             div { class: "container", id: "center_works_container",
                 div { class: "container", id: "library_header",
                     h1 { id: "works_title", "PUBLIC LIBRARY" }
