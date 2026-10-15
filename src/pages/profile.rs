@@ -1,31 +1,9 @@
 use dioxus::prelude::*;
+use crate::components::*;
 
-use crate::components::ProfileCard;
-use crate::components::WorkItem;
 #[component]
-pub fn Profile() -> Element {
+pub fn Profile(user_id: String) -> Element {
     rsx! {
-        div { class: "container", id: "mother_container",
-            ProfileCard {
-            }
-
-            div { class: "container", id: "center_works_container",
-                div { class: "container", id: "home_header",
-                    h1 { id: "works_title", "THEIR PERSONAL WORKS" }
-                }
-
-                div { class: "container", id: "contents_container",
-                    //replace this with sql fetches
-                    WorkItem {
-                        id: "work_1",
-                        img_src: asset!("/assets/img_assets/profile.jpg"),
-                        thumbnail: asset!("/assets/img_assets/thumbnail.jpg"),
-                        title: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore",
-                        author: "ludwig von mises",
-                        date: "09/25/26",
-                    }
-                }
-            }
-        }
+        ProfilePage { user_id }
     }
 }

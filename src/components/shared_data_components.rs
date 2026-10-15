@@ -63,3 +63,48 @@ pub fn FileDropzone(
         }
     }
 }
+
+#[derive(Clone, PartialEq)]
+pub struct UserProfile {
+    pub name: String,
+    pub profile_img: Asset,
+    pub credentials: Vec<String>,
+}
+
+//Temporary placeholder until the database function exists
+pub fn placeholder_profile() -> UserProfile {
+    UserProfile {
+        name: "Alan Turing".into(),
+        profile_img: asset!("/assets/img_assets/profile.jpg"),
+        credentials: vec![
+            "Software Engineer".into(),
+            "Mathematician".into(),
+            "Cryptanalyst".into(),
+        ],
+    }
+}
+
+#[derive(Clone, PartialEq)]
+pub struct FileEntry {
+    pub folder: String,
+    pub name: String,
+    pub size: usize,
+    pub version: String,
+    pub updated: String,
+}
+
+#[derive(Clone, PartialEq)]
+pub struct WorkEntry {
+    pub id: String,
+    pub title: String,
+    pub author: String,
+    pub date: String,
+    pub thumbnail: Asset,
+    pub author_img: Asset,
+}
+
+#[derive(Clone, PartialEq)]
+pub struct ContributorEntry {
+    pub name: String,
+    pub profile_img: Asset,
+}

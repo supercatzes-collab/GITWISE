@@ -1,35 +1,25 @@
 use dioxus::prelude::*;
 use crate::route::Route;
-use crate::components::*;
-
-
+use crate::components::shared_data_components::*;
 //components needs to be edited.
+//The profile card that displays all the details of the profile for all pages.
 #[component]
-pub fn ProfileCard(children: Element) -> Element {
+pub fn ProfileCard(profile: UserProfile, children: Element) -> Element {
     rsx! {
         div { class: "container", id: "profile_details_container",
             div { class: "container", id: "profile_container",
                 //make this dynamic
-                img {
-                    src: asset!("/assets/img_assets/profile.jpg"),
-                    id: "profile_img",
-                }
+                img { src: profile.profile_img, id: "profile_img" }
             }
 
             //make this dynamic
             div { class: "container", id: "profile_info_container",
-                h1 { id: "profile_name", "Alan Turing" }
+                h1 { id: "profile_name", "{profile.name}" }
             }
 
             //make this dynamic
             div { class: "container", id: "profile_info_sub_container",
-                ul {
-                    id: "profile_info_ul",
-                    style: "list-style: none; margin: 0; padding: 0;",
-                    li { "Software Engineer" }
-                    li { "Mathematician" }
-                    li { "Cryptanalyst" }
-                }
+                CredentialList { items: profile.credentials.clone() }
             }
 
             {children}
@@ -37,6 +27,78 @@ pub fn ProfileCard(children: Element) -> Element {
     }
 }
 
+//Home and Profile both render this. Only the user id differs.
+#[component]
+pub fn ProfilePage(user_id: String) -> Element {
+    let nav = navigator();
+    let me: Signal<String> = use_context();
+    let is_mine = user_id == me();
+    //later: let profile = get_profile(&user_id);
+    let profile = placeholder_profile();
+    let works = use_signal(|| {
+        vec![
+            //replace this with sql fetches
+            WorkEntry {
+                id: "work_1".into(),
+                title: "Lorem ipsum dolor sit amet".into(),
+                author: "ludwig von mises".into(),
+                date: "09/25/26".into(),
+                thumbnail: asset!("/assets/img_assets/thumbnail.jpg"),
+                author_img: asset!("/assets/img_assets/profile.jpg"),
+            },
+        ]
+    });
+    rsx! {
+        div { class: "container", id: "mother_container",
+            ProfileCard { profile,
+                if is_mine {
+                    ProfileActions {
+                        pending_count: 2,
+                        watching_count: 1,
+                        outgoing_count: 0,
+                    }
+                }
+            }
+
+            div { class: "container", id: "center_works_container",
+                div { class: "container", id: "home_header",
+                    h1 { id: "works_title",
+                        if is_mine {
+                            "YOUR PERSONAL WORKS"
+                        } else {
+                            "THEIR PERSONAL WORKS"
+                        }
+                    }
+                    if is_mine {
+                        button {
+                            class: "button",
+                            id: "new_works_button",
+                            onclick: move |_| {
+                                nav.push(Route::Upload {});
+                            },
+                            "+"
+                        }
+                    }
+                }
+                div { class: "container", id: "contents_container",
+                    for work in works.read().iter() {
+                        WorkItem {
+                            key: "{work.id}",
+                            id: work.id.clone(),
+                            img_src: work.author_img,
+                            thumbnail: work.thumbnail,
+                            title: work.title.clone(),
+                            author: work.author.clone(),
+                            date: work.date.clone(),
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+//The statistics button on the top-right in the download page.
 #[component]
 pub fn StatsBtns(
     stars: usize,
@@ -50,6 +112,7 @@ pub fn StatsBtns(
     }
 }
 
+//The main content of the download page.
 #[component]
 pub fn CenterDetails(
     title: String,
@@ -67,6 +130,7 @@ pub fn CenterDetails(
     }
 }
 
+//The details of the title in the download page.
 #[component] 
 pub fn ItemDetails(
     upload_date: String,
@@ -93,6 +157,7 @@ pub fn ItemDetails(
     }
 }
 
+//
 #[component]
 pub fn ProfileActions(
     pending_count: usize,
@@ -150,7 +215,9 @@ pub fn WatchingUpdates(
                 class: "button",
                 id: "view_button",
                 onclick: move |_| {
-                    nav.push(Route::Download {});
+                    nav.push(Route::Download {
+                        item_id: "1".to_string(),
+                    });
                 },
                 "view"
             }
@@ -173,13 +240,15 @@ pub fn WorkItem(id: String,
     thumbnail: Asset,
 ) -> Element {
     let nav = navigator();
-
+    let item_id = id.clone();   
     rsx! {
         div {
             class: "works_item",
             id: "{id}",
             onclick: move |_| {
-                nav.push(Route::Download {});
+                nav.push(Route::Download {
+                    item_id: item_id.clone(),
+                });
             },
             img { src: thumbnail, class: "content_img" }
             h1 { class: "content_title", "{title}" }
@@ -206,7 +275,6 @@ pub fn PendingUpdates(
     on_dismiss: EventHandler<String>,
 ) -> Element {
     let nav = navigator();
-    
     rsx! {
         div { class: "notification_content_request", id: "{id}",
             //author header div
@@ -218,7 +286,9 @@ pub fn PendingUpdates(
                     class: "button",
                     id: "check_profile_button",
                     onclick: move |_| {
-                        nav.push(Route::Profile {});
+                        nav.push(Route::Profile {
+                            user_id: "2".to_string(),
+                        });
                     },
                     "check profile"
                 }
@@ -275,7 +345,9 @@ pub fn OutgoingUpdates(
                 class: "button",
                 id: "view_button",
                 onclick: move |_| {
-                    nav.push(Route::Download {});
+                    nav.push(Route::Download {
+                        item_id: "1".to_string(),
+                    });
                 },
                 "view"
             }
@@ -294,9 +366,14 @@ pub fn FileItem(
     title: String,
     selected_file: String,
     file_size: usize,
+    selected: bool,
+    on_click: EventHandler<()>,
 ) -> Element {
     rsx! {
-        p { class: "file_cards", id: "page_id",
+        p {
+            class: "file_cards",
+            id: "page_id",
+            onclick: move |_| on_click.call(()),
             span { id: "details_text_1", class: "page_sub_text", "{title}" }
             span { id: "details_text_2", class: "page_sub_text", "/{selected_file}" }
             span { id: "details_text_3", class: "page_sub_text", "{file_size}KB" }
@@ -324,13 +401,8 @@ pub fn SelectedFileItemDetails(
 }
 
 #[component]
-pub fn ContributorsProfileList(
-    count: usize,
-    profile_img: Asset,
-    name: String,
-) -> Element {
+pub fn ContributorsProfileList(profile_img: Asset, name: String) -> Element {
     rsx! {
-        h1 { id: "contributors_label", "CONTRIBUTORS: {count}" }
         div { class: "contributors_card", id: "contributor_id",
             img { src: profile_img, class: "contributor_profile_img" }
             p { class: "contributor_name", id: "contributor_name_id", "{name}" }

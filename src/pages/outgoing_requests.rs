@@ -34,8 +34,7 @@ pub fn Outgoing() -> Element {
 
     rsx!{
         div { class: "container", id: "mother_container",
-            ProfileCard {
-                //replace this with sql fetches
+            ProfileCard { profile: placeholder_profile(),
                 ProfileActions { pending_count: 2, watching_count: 1, outgoing_count: 0 }
             }
 

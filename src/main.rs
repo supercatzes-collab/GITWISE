@@ -22,9 +22,10 @@ const UPLOAD_CSS: Asset = asset!("/assets/upload.css");
 const SETTINGS_CSS: Asset = asset!("/assets/settings.css");
 const SIGN_CSS: Asset = asset!("/assets/sign.css");
 
-
 #[component]
 fn App() -> Element {
+    //Why?
+    use_context_provider(|| Signal::new("1".to_string()));
     rsx! {
         document::Link { rel: "stylesheet", href: MAIN_CSS }
         document::Link { rel: "stylesheet", href: HOME_CSS }

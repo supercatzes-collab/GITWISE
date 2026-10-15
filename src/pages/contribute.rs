@@ -1,19 +1,36 @@
 use dioxus::prelude::*;
 use crate::components::*;
-
+use crate::Route;
 //Note each individual right hand component should be unique to the file slected. So it must be a component too.
 
 
 #[component] 
-pub fn Contribute() -> Element {
-    let mut chosen = use_signal(String::new);
+pub fn Contribute(item_id: String) -> Element {
     //let item = Item {
     //    id: "1".into(),
     //    title: "Lorem ipsum dolor sit amet".into(),
     //    other fields
     //};
     // later: let item = get_item(&item_id);
+    let nav = navigator();
+    let mut chosen = use_signal(String::new);
     let title = "Lorem ipsum dolor sit amet consectetur adipiscing elit";
+    let mut selected = use_signal(|| 0usize);
+    let mut note = use_signal(String::new);
+    let files = use_signal(|| {
+        vec![
+            //Needs to replaced by an SQL fetch
+            FileEntry {
+                folder: "GITWISE".into(),
+                name: "chapter1.docx".into(),
+                size: 8,
+                version: "v1.2.3".into(),
+                updated: "5/05/26".into(),
+            },
+            // more entries
+        ]
+    });
+    let selected_file = files.read().get(*selected.read()).cloned();
     rsx! {
         div { class: "container", id: "mother_container",
             div { class: "container", id: "main_container",
@@ -26,10 +43,15 @@ pub fn Contribute() -> Element {
                     div { class: "container", id: "left_inner_container",
                         p { id: "left_inner_header", "Choose a file to replace:" }
                         //Needs to replaced by an SQL fetch
-                        FileItem {
-                            title: "GITWISE",
-                            selected_file: "chapter1.docx",
-                            file_size: 10,
+                        for (i , file) in files.read().iter().enumerate() {
+                            FileItem {
+                                key: "{i}",
+                                title: file.folder.clone(),
+                                selected_file: file.name.clone(),
+                                file_size: file.size,
+                                selected: i == *selected.read(),
+                                on_click: move |_| selected.set(i),
+                            }
                         }
                     }
 
@@ -41,11 +63,13 @@ pub fn Contribute() -> Element {
                                 "Replacing: "
                             }
                             //Needs to replaced by an SQL fetch
-                            SelectedFileItemDetails {
-                                selected_file: "parent",
-                                version: "v1.2.3",
-                                file_size: 18,
-                                update: "5/05/26",
+                            if let Some(file) = &selected_file {
+                                SelectedFileItemDetails {
+                                    selected_file: format!("{}/{}", file.folder, file.name),
+                                    version: file.version.clone(),
+                                    file_size: file.size,
+                                    update: file.updated.clone(),
+                                }
                             }
                         }
 
@@ -69,6 +93,7 @@ pub fn Contribute() -> Element {
                             on_select: move |path: String| {
                                 chosen.set(path);
                             },
+                        
                         }
 
                         p {
@@ -77,9 +102,35 @@ pub fn Contribute() -> Element {
                             "Describe what changed"
                         }
                         //actions need to point ta a struct.
-                        textarea { id: "text_area", placeholder: "Insert text here" }
-                        button { class: "button", id: "upload_contribution_btn", "SUBMIT EDIT REQUEST" }
-                        button { class: "button", id: "cancel_contribution_btn", "CANCEL" }
+                        textarea {
+                            id: "text_area",
+                            placeholder: "Insert text here",
+                            oninput: move |evt| note.set(evt.value()),
+                        }
+                        button {
+                            class: "button",
+                            id: "upload_contribution_btn",
+                            onclick: move |_| {
+                                //temporary: replace this with the call that inserts the proposal
+                                println!(
+                                    "submit: file={} note={}",
+                                    chosen.read().as_str(),
+                                    note.read().as_str(),
+                                );
+                                nav.push(Route::Outgoing {});
+                            },
+                            "SUBMIT EDIT REQUEST"
+                        }
+                        button {
+                            class: "button",
+                            id: "cancel_contribution_btn",
+                            onclick: move |_| {
+                                nav.push(Route::Download {
+                                    item_id: "1".to_string(),
+                                });
+                            },
+                            "CANCEL"
+                        }
                     }
                 }
             }

@@ -1,9 +1,11 @@
 use dioxus::prelude::*;
 use crate::components::*;
+use crate::Route;
 //Note each individual right hand component should be unique to the file slected. 
 //So it must be a component too.
 #[component] 
 pub fn IncomingRequest() -> Element {
+    let nav = navigator();
     //let item = Item {
     //    id: "1".into(),
     //    title: "Lorem ipsum dolor sit amet".into(),
@@ -35,12 +37,12 @@ pub fn IncomingRequest() -> Element {
                 div { class: "container", id: "secondary_main_container",
                     div { class: "container", id: "left_inner_container",
                         p { id: "left_inner_header", "Files changed:" }
-                        //Needs to replaced by an SQL fetch
-                        FileItem {
-                            title: "GITWISE",
-                            selected_file: "chapter1.docx",
-                            file_size: 10,
-                        }
+                                        //Needs to replaced by an SQL fetch
+                    //FileItem {
+                    //    title: "GITWISE",
+                    //    selected_file: "chapter1.docx",
+                    //    file_size: 10,
+                    //}
                     }
 
                     div { class: "container", id: "right_inner_container",
@@ -60,9 +62,25 @@ pub fn IncomingRequest() -> Element {
 
                         p { class: "page_sub_text", id: "description", "{description}" }
                         //Updates original file version & redirects author to download page.
-                        button { class: "button", id: "upload_contribution_btn", "ACCEPT REQUEST" }
+                        button {
+                            class: "button",
+                            id: "upload_contribution_btn",
+                            onclick: move |_| {
+                                nav.push(Route::Download {
+                                    item_id: "1".to_string(),
+                                });
+                            },
+                            "ACCEPT REQUEST"
+                        }
                         //Update the state of the outgoing request of the requester and update ingoing request of the author.
-                        button { class: "button", id: "cancel_contribution_btn", "CANCEL" }
+                        button {
+                            class: "button",
+                            id: "cancel_contribution_btn",
+                            onclick: move |_| {
+                                nav.push(Route::Pending {});
+                            },
+                            "CANCEL"
+                        }
                     }
                 }
             }

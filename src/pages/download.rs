@@ -1,18 +1,30 @@
 use dioxus::prelude::*;
-use crate::components::general_components::*;
-use crate::route::Route;
-
+use crate::components::*;
+use crate::Route;
 #[component]
-pub fn Download() -> Element {
+pub fn Download(item_id: String) -> Element {
     let nav = navigator();
+    let contributors = use_signal(|| {
+        vec![
+            //replace this with sql fetches
+            ContributorEntry {
+                name: "Ada Lovelace".into(),
+                profile_img: asset!("/assets/img_assets/profile.jpg"),
+            },
+        ]
+    });
+    let contributor_count = contributors.read().len();
     rsx! {
         div { class: "container", id: "mother_container",
-            ProfileCard {
+            ProfileCard { profile: placeholder_profile(),
+
                 button {
                     class: "button",
                     id: "view_profile_button",
                     onclick: move |_| {
-                        nav.push(Route::Profile {});
+                        nav.push(Route::Profile {
+                            user_id: "2".to_string(),
+                        });
                     },
                     "VIEW PROFILE"
                 }
@@ -45,16 +57,21 @@ pub fn Download() -> Element {
                     class: "button",
                     id: "contribute_button",
                     onclick: move |_| {
-                        nav.push(Route::Contribute {});
+                        nav.push(Route::Contribute {
+                            item_id: "1".to_string(),
+                        });
                     },
                     "CONTRIBUTE"
                 }
                 //replace this with sql fetches
                 div { class: "container", id: "contributors_list",
-                    ContributorsProfileList {
-                        count: 1,
-                        profile_img: asset!("/assets/img_assets/profile.jpg"),
-                        name: "Ada Lovelace",
+                    h1 { id: "contributors_label", "CONTRIBUTORS: {contributor_count}" }
+                    for contributor in contributors.read().iter() {
+                        ContributorsProfileList {
+                            key: "{contributor.name}",
+                            profile_img: contributor.profile_img,
+                            name: contributor.name.clone(),
+                        }
                     }
                 }
             }
