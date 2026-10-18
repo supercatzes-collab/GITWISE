@@ -1,10 +1,9 @@
-use dioxus::prelude::*;
 use crate::components::*;
 use crate::Route;
+use dioxus::prelude::*;
 //Note each individual right hand component should be unique to the file slected. So it must be a component too.
 
-
-#[component] 
+#[component]
 pub fn Contribute(item_id: String) -> Element {
     //let item = Item {
     //    id: "1".into(),
@@ -14,6 +13,7 @@ pub fn Contribute(item_id: String) -> Element {
     // later: let item = get_item(&item_id);
     let nav = navigator();
     let mut chosen = use_signal(String::new);
+    //temporary
     let title = "Lorem ipsum dolor sit amet consectetur adipiscing elit";
     let mut selected = use_signal(|| 0usize);
     let mut note = use_signal(String::new);
@@ -93,7 +93,7 @@ pub fn Contribute(item_id: String) -> Element {
                             on_select: move |path: String| {
                                 chosen.set(path);
                             },
-                        
+
                         }
 
                         p {

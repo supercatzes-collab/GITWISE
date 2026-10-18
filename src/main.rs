@@ -1,10 +1,10 @@
+//main.rs
 use dioxus::prelude::*;
-
 pub mod components;
+pub mod database;
 pub mod navbar;
 pub mod pages;
 pub mod route;
-
 
 use route::Route;
 
@@ -24,18 +24,34 @@ const SIGN_CSS: Asset = asset!("/assets/sign.css");
 
 #[component]
 fn App() -> Element {
-    //Why?
-    use_context_provider(|| Signal::new("1".to_string()));
-    rsx! {
-        document::Link { rel: "stylesheet", href: MAIN_CSS }
-        document::Link { rel: "stylesheet", href: HOME_CSS }
-        document::Link { rel: "stylesheet", href: LIBRARY_CSS }
-        document::Link { rel: "stylesheet", href: DOWNLOAD_CSS }
-        document::Link { rel: "stylesheet", href: NOTIFICATION_CSS }
-        document::Link { rel: "stylesheet", href: CONTRIBUTE_CSS }
-        document::Link { rel: "stylesheet", href: UPLOAD_CSS }
-        document::Link { rel: "stylesheet", href: SETTINGS_CSS }
-        document::Link { rel: "stylesheet", href: SIGN_CSS }
-        Router::<Route> {}
+    // Set the hardcoded current user ID.
+    use_context_provider(|| Signal::new("test-001".to_string()));
+
+    // Initialize the database once when the component is created.
+    let db_result = use_hook(|| {
+        database::initialize_database()
+            .and_then(|conn| {
+                database::ensure_default_account(&conn)?;
+                Ok(())
+            })
+            .map_err(|err| err.to_string())
+    });
+
+    match db_result {
+        Ok(()) => rsx! {
+            document::Link { rel: "stylesheet", href: MAIN_CSS }
+            document::Link { rel: "stylesheet", href: HOME_CSS }
+            document::Link { rel: "stylesheet", href: LIBRARY_CSS }
+            document::Link { rel: "stylesheet", href: DOWNLOAD_CSS }
+            document::Link { rel: "stylesheet", href: NOTIFICATION_CSS }
+            document::Link { rel: "stylesheet", href: CONTRIBUTE_CSS }
+            document::Link { rel: "stylesheet", href: UPLOAD_CSS }
+            document::Link { rel: "stylesheet", href: SETTINGS_CSS }
+            document::Link { rel: "stylesheet", href: SIGN_CSS }
+            Router::<Route> {}
+        },
+        Err(err) => rsx! {
+            div { "Database initialization failed: {err}" }
+        },
     }
 }

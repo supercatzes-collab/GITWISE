@@ -1,10 +1,10 @@
+use crate::components::*;
 use crate::route::Route;
 use dioxus::prelude::*;
-use crate::components::*;
 
 #[component]
 pub fn Signin() -> Element {
-    let nav  = navigator();
+    let nav = navigator();
     let mut profile_path = use_signal(String::new);
     let mut username = use_signal(String::new);
     let mut password = use_signal(String::new);

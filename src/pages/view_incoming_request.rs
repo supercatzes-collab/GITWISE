@@ -1,9 +1,9 @@
-use dioxus::prelude::*;
 use crate::components::*;
 use crate::Route;
-//Note each individual right hand component should be unique to the file slected. 
+use dioxus::prelude::*;
+//Note each individual right hand component should be unique to the file slected.
 //So it must be a component too.
-#[component] 
+#[component]
 pub fn IncomingRequest() -> Element {
     let nav = navigator();
     //let item = Item {

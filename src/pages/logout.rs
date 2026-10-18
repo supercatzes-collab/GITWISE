@@ -1,15 +1,14 @@
+use crate::components::*;
 use crate::route::Route;
 use dioxus::prelude::*;
-use crate::components::*;
 
 #[component]
 pub fn Settings() -> Element {
     let nav = navigator();
     //needs to be done to every profile list
-    let mut credentials = use_signal(|| {
-        vec![]
-    });
+    let mut credentials = use_signal(|| vec![]);//container list for fake credentials like scientist
     let mut draft = use_signal(String::new);
+    let mut current_user = use_context::<Signal<String>>();
     rsx! {
         div { class: "container", id: "settings_main_container",
             div { class: "container", id: "settings_secondary_container",
@@ -48,6 +47,33 @@ pub fn Settings() -> Element {
                     nav.push(Route::Login {});
                 },
                 "LOG OUT"
+            }
+
+            div { id: "dev_account_switcher",
+
+                p { "DEV ACCOUNT: {current_user.read()}" }
+
+                button {
+                    class: "button dev_btn",
+                    onclick: move |_| {
+                        current_user.set("test-001".to_string());
+                        nav.push(Route::Profile {
+                            user_id: "test-001".to_string(),
+                        });
+                    },
+                    "Switch to Author"
+                }
+
+                button {
+                    class: "button dev_btn",
+                    onclick: move |_| {
+                        current_user.set("test-002".to_string());
+                        nav.push(Route::Profile {
+                            user_id: "test-002".to_string(),
+                        });
+                    },
+                    "Switch to Contributor"
+                }
             }
         }
     }

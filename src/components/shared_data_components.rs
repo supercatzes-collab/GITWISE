@@ -64,6 +64,7 @@ pub fn FileDropzone(
     }
 }
 
+//Account struct
 #[derive(Clone, PartialEq)]
 pub struct UserProfile {
     pub name: String,
@@ -71,19 +72,7 @@ pub struct UserProfile {
     pub credentials: Vec<String>,
 }
 
-//Temporary placeholder until the database function exists
-pub fn placeholder_profile() -> UserProfile {
-    UserProfile {
-        name: "Alan Turing".into(),
-        profile_img: asset!("/assets/img_assets/profile.jpg"),
-        credentials: vec![
-            "Software Engineer".into(),
-            "Mathematician".into(),
-            "Cryptanalyst".into(),
-        ],
-    }
-}
-
+//File items
 #[derive(Clone, PartialEq)]
 pub struct FileEntry {
     pub folder: String,
@@ -107,4 +96,50 @@ pub struct WorkEntry {
 pub struct ContributorEntry {
     pub name: String,
     pub profile_img: Asset,
+}
+
+/////////////////////////////////
+
+#[derive(Clone, Debug, PartialEq)]
+pub struct Account {
+    pub id: String,
+    pub username: String,
+    pub password: String,
+    pub display_name: String,
+    pub profile_img_path: String,
+    pub credentials: Vec<String>,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub struct Item {
+    pub id: String,
+    pub title: String,
+    pub abstract_text: String,
+    pub author_id: String,
+    pub date: String,
+    pub version: String,
+    pub thumbnail_path: String,
+    pub folder_path: String,
+    pub stars: i64,
+    pub watching: i64,
+    pub downloads: i64,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub struct Proposal {
+    pub id: String,
+    pub item_id: String,
+    pub target_file_path: String,
+    pub proposer_id: String,
+    pub replacement_path: String,
+    pub note: String,
+    pub status: ProposalStatus,
+    pub date: String,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum ProposalStatus {
+    Pending,
+    Accepted,
+    Rejected,
 }

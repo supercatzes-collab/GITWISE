@@ -1,6 +1,6 @@
-use dioxus::prelude::*;
+//pending.rs
 use crate::components::*;
-
+use dioxus::prelude::*;
 
 #[component]
 pub fn Pending() -> Element {

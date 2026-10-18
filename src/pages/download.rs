@@ -1,80 +1,217 @@
-use dioxus::prelude::*;
-use crate::components::*;
-use crate::Route;
-#[component]
-pub fn Download(item_id: String) -> Element {
-    let nav = navigator();
-    let contributors = use_signal(|| {
-        vec![
-            //replace this with sql fetches
-            ContributorEntry {
-                name: "Ada Lovelace".into(),
-                profile_img: asset!("/assets/img_assets/profile.jpg"),
-            },
-        ]
-    });
-    let contributor_count = contributors.read().len();
-    rsx! {
-        div { class: "container", id: "mother_container",
-            ProfileCard { profile: placeholder_profile(),
+//download.rs
+    use crate::components::*;
+    use crate::database::{
+        get_account_profile,
+        get_item_by_id,
+        increment_item_downloads,
+        initialize_database,
+        toggle_item_star,
+        toggle_item_watch,
+    };
+    use crate::Route;
+    use chrono::{Local, TimeZone};
+    use dioxus::prelude::*;
 
-                button {
-                    class: "button",
-                    id: "view_profile_button",
-                    onclick: move |_| {
-                        nav.push(Route::Profile {
-                            user_id: "2".to_string(),
-                        });
-                    },
-                    "VIEW PROFILE"
-                }
+    #[component]
+    pub fn Download(item_id: String) -> Element {
+        let nav = navigator();
+        let current_user: Signal<String> = use_context();
+        let mut download_count_refresh = use_signal(|| 0_u32);
 
-                ItemDetails {
-                    //replace this with sql fetches
-                    upload_date: "10/10/26",
-                    update_date: "10/10/26",
-                    count: 4,
+        let item = use_resource({
+            let item_id = item_id.clone();
+
+            move || {
+                let item_id = item_id.clone();
+                let _refresh = *download_count_refresh.read();
+
+                async move {
+                    let conn = initialize_database()
+                        .expect("Failed to initialize database");
+
+                    get_item_by_id(&conn, &item_id)
+                        .expect("Failed to retrieve item")
                 }
             }
+        });
 
-            div { class: "container", id: "center_container",
-                //replace this with sql fetches
-                CenterDetails {
-                    title: "lorem ipsum dolor sit amet consectetur adipiscing elit velit libero temporibus occaecat commodo fugiat quis ducimus ipsum laboris excepteur qui fugiat et distinctio quibusdam quidem expedita"
-                        .to_string(),
-                    version: "v1.2.3".to_string(),
-                    thumbnail: asset!("/assets/img_assets/thumbnail.jpg"),
-                    abstrakt: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur. Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur. At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident."
-                        .to_string(),
-                }
-            }
+        let contributors = use_signal(|| {
+            vec![
+                // Replace this with SQL fetches later.
+                ContributorEntry {
+                    name: "Ada Lovelace".into(),
+                    profile_img: asset!("/assets/img_assets/profile.jpg"),
+                },
+            ]
+        });
 
-            div { class: "container", id: "details_container",
-                //replace this with sql fetches
-                StatsBtns { stars: 10, watching: 10, downloads: 10 }
+        let contributor_count = contributors.read().len();
+        let item_read = item.read();
 
-                button {
-                    class: "button",
-                    id: "contribute_button",
-                    onclick: move |_| {
-                        nav.push(Route::Contribute {
-                            item_id: "1".to_string(),
-                        });
-                    },
-                    "CONTRIBUTE"
-                }
-                //replace this with sql fetches
-                div { class: "container", id: "contributors_list",
-                    h1 { id: "contributors_label", "CONTRIBUTORS: {contributor_count}" }
-                    for contributor in contributors.read().iter() {
-                        ContributorsProfileList {
-                            key: "{contributor.name}",
-                            profile_img: contributor.profile_img,
-                            name: contributor.name.clone(),
+        match &*item_read {
+            // The item was found in the database.
+            Some(Some(item)) => {
+                let formatted_date = Local
+                    .timestamp_opt(
+                        item.date.parse::<i64>().unwrap_or(0),
+                        0,
+                    )
+                    .single()
+                    .map(|date| date.format("%B %d, %Y").to_string())
+                    .unwrap_or_else(|| "Unknown date".to_string());
+
+                let author_id = item.author_id.clone();
+
+                // Retrieve the item's actual author from the database.
+                let conn = initialize_database()
+                    .expect("Failed to initialize database");
+
+                let profile = get_account_profile(&conn, &author_id)
+                    .expect("Failed to retrieve author profile")
+                    .expect("Author profile not found");
+
+                let credentials: Vec<String> =
+                    serde_json::from_str(&profile.credentials)
+                        .unwrap_or_default();
+
+                let profile_img = match profile.profile_img_path.as_str() {
+                    "assets/img_assets/profile_1.jpg" => {
+                        asset!("/assets/img_assets/profile_1.jpg")
+                    }
+                    _ => asset!("/assets/img_assets/profile.jpg"),
+                };
+
+                let author_profile = UserProfile {
+                    name: profile.display_name,
+                    profile_img,
+                    credentials,
+                };
+
+                rsx! {
+                    div { class: "container", id: "mother_container",
+
+                        ProfileCard { profile: author_profile,
+
+                            button {
+                                class: "button",
+                                id: "view_profile_button",
+
+                                onclick: {
+                                    let author_id = author_id.clone();
+
+                                    move |_| {
+                                        nav.push(Route::Profile {
+                                            user_id: author_id.clone(),
+                                        });
+                                    }
+                                },
+
+                                "VIEW PROFILE"
+                            }
+
+                            ItemDetails {
+                                upload_date: formatted_date.clone(),
+                                update_date: formatted_date.clone(),
+                            }
+                        }
+
+                        div { class: "container", id: "center_container",
+
+                            CenterDetails {
+                                title: item.title.clone(),
+                                version: item.version.clone(),
+                                thumbnail: get_thumbnail(&item.thumbnail_path),
+                                abstrakt: item.abstract_text.clone(),
+
+                                on_download: {
+                                    let download_item_id = item_id.clone();
+
+                                    move |_| {
+                                        let conn = initialize_database()
+                                            .expect("Failed to initialize database");
+
+                                        increment_item_downloads(&conn, &download_item_id)
+                                            .expect("Failed to increment download count");
+
+                                        download_count_refresh += 1;
+                                    }
+                                },
+                            }
+                        
+                        }
+
+                        div { class: "container", id: "details_container",
+
+                            StatsBtns {
+                                stars: item.stars as usize,
+                                watching: item.watching as usize,
+                                downloads: item.downloads as usize,
+
+                                on_star: {
+                                    let star_item_id = item_id.clone();
+                                    let star_user_id = current_user.read().clone();
+
+                                    move |_| {
+                                        let conn = initialize_database()
+                                            .expect("Failed to initialize database");
+                                        toggle_item_star(&conn, &star_item_id, &star_user_id)
+                                            .expect("Failed to toggle item star");
+                                        download_count_refresh += 1;
+                                    }
+                                },
+
+                                on_watch: {
+                                    let watch_item_id = item_id.clone();
+                                    let watch_user_id = current_user.read().clone();
+                                    move |_| {
+                                        let conn = initialize_database().expect("Failed to initialize database");
+                                        toggle_item_watch(&conn, &watch_item_id, &watch_user_id)
+                                            .expect("Failed to toggle item watch");
+
+                                        download_count_refresh += 1;
+                                    }
+                                },
+                            }
+
+                            button {
+                                class: "button",
+                                id: "contribute_button",
+
+                                onclick: move |_| {
+                                    nav.push(Route::Contribute {
+                                        item_id: item_id.clone(),
+                                    });
+                                },
+
+                                "CONTRIBUTE"
+                            }
+
+                            div { class: "container", id: "contributors_list",
+
+                                h1 { id: "contributors_label", "CONTRIBUTORS: {contributor_count}" }
+
+                                for contributor in contributors.read().iter() {
+                                    ContributorsProfileList {
+                                        key: "{contributor.name}",
+                                        profile_img: contributor.profile_img,
+                                        name: contributor.name.clone(),
+                                    }
+                                }
+                            }
                         }
                     }
                 }
             }
+
+            // The query completed, but no matching item exists.
+            Some(None) => rsx! {
+                div { class: "container", "Item not found." }
+            },
+
+            // The query is still running.
+            None => rsx! {
+                div { class: "container", "Loading item..." }
+            },
         }
     }
-}
+

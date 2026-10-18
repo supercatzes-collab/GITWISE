@@ -1,5 +1,5 @@
-use dioxus::prelude::*;
 use crate::components::*;
+use dioxus::prelude::*;
 
 #[component]
 pub fn Outgoing() -> Element {
@@ -32,7 +32,7 @@ pub fn Outgoing() -> Element {
         ]
     });
 
-    rsx!{
+    rsx! {
         div { class: "container", id: "mother_container",
             ProfileCard { profile: placeholder_profile(),
                 ProfileActions { pending_count: 2, watching_count: 1, outgoing_count: 0 }

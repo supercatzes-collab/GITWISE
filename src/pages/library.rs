@@ -1,32 +1,73 @@
+
+use crate::components::*;
+use crate::database::{
+    get_account_display_name,
+    get_account_profile,
+    get_all_items,
+    initialize_database,
+};
 use dioxus::prelude::*;
-use crate::components::general_components::*;
-use crate::components::shared_data_components::*;
+
 #[component]
 pub fn Library() -> Element {
     let mut search = use_signal(String::new);
     let query = search.read().to_lowercase();
+    let me: Signal<String> = use_context();
+
+    // Retrieve public works from SQLite.
     let works = use_signal(|| {
-        vec![
-            //this is supposed to take in data from the database.
-            WorkEntry {
-                id: "work_1".into(),
-                title: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore".into(),
-                author: "ludwig von mises".into(),
-                date: "09/25/26".into(),
-                thumbnail: asset!("/assets/img_assets/thumbnail.jpg"),
-                author_img: asset!("/assets/img_assets/profile.jpg"),
-            },
-        ]
+        let conn = initialize_database()
+            .expect("Failed to initialize database");
+
+        let items = get_all_items(&conn)
+            .expect("Failed to retrieve library items");
+
+        items
+            .into_iter()
+            .map(|item| {
+                let author = get_account_display_name(&conn, &item.author_id)
+                    .ok()
+                    .flatten()
+                    .unwrap_or_else(|| item.author_id.clone());
+            
+                let profile_img_path = get_account_profile(&conn, &item.author_id)
+                    .ok()
+                    .flatten()
+                    .map(|profile| profile.profile_img_path)
+                    .unwrap_or_default();
+            
+                let author_img = match profile_img_path.as_str() {
+                    "assets/img_assets/profile_1.jpg" => {
+                        asset!("/assets/img_assets/profile_1.jpg")
+                    }
+                    _ => asset!("/assets/img_assets/profile.jpg"),
+                };
+            
+                WorkEntry {
+                    id: item.id,
+                    title: item.title,
+                    author,
+                    date: item.date,
+                    thumbnail: get_thumbnail(&item.thumbnail_path),
+                    author_img,
+                }
+            })
+
+            .collect::<Vec<WorkEntry>>()
     });
+
     rsx! {
         div { class: "container", id: "mother_container",
 
-            ProfileCard { profile: placeholder_profile() }
+            // Only renders the profile sidebar, not another mother_container.
+            ProfileSidebar { user_id: me() }
 
-            //Needs to become a search funtion
             div { class: "container", id: "center_works_container",
+
                 div { class: "container", id: "library_header",
+
                     h1 { id: "works_title", "PUBLIC LIBRARY" }
+
                     input {
                         id: "search_bar",
                         placeholder: "Search research title",
@@ -37,8 +78,8 @@ pub fn Library() -> Element {
                 }
 
                 div { class: "container", id: "contents_container",
-                    //this is supposed to take in data from the database.
-                    for work in works.read().iter().filter(|w| w.title.to_lowercase().contains(&query)) {
+
+                    for work in works.read().iter().filter(|work| work.title.to_lowercase().contains(&query)) {
                         WorkItem {
                             key: "{work.id}",
                             id: work.id.clone(),

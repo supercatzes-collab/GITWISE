@@ -1,5 +1,9 @@
-use dioxus::prelude::*;
+//upload.rs
+use crate::components::shared_data_components::Item;
+use crate::database;
 use crate::route::Route;
+use dioxus::prelude::*;
+use std::time::{SystemTime, UNIX_EPOCH};
 
 #[component]
 pub fn Upload() -> Element {
@@ -8,6 +12,8 @@ pub fn Upload() -> Element {
     let mut abstrakt = use_signal(String::new);
     let mut image_path = use_signal(String::new);
     let mut zip_path = use_signal(String::new);
+    let mut upload_message = use_signal(String::new);
+    let current_user: Signal<String> = use_context();
     rsx! {
         div { class: "container", id: "upload_mother_container",
             div { id: "upload_title",
@@ -73,20 +79,47 @@ pub fn Upload() -> Element {
             button {
                 class: "button",
                 id: "upload_button",
-                //to do: send user back to home then builds the item
                 onclick: move |_| {
-                    //temporary: replace this with the function that handles the upload
-                    println!(
-                        "upload: title={} abstract={} image={} zip={}",
-                        title.read().as_str(),
-                        abstrakt.read().as_str(),
-                        image_path.read().as_str(),
-                        zip_path.read().as_str(),
-                    );
-                    nav.push(Route::Home {});
+                    let now = SystemTime::now()
+                        .duration_since(UNIX_EPOCH)
+                        .unwrap_or_default();
+
+                    let item = Item {
+                        id: format!("item-{}", now.as_millis()),
+                        title: title.read().to_string(),
+                        abstract_text: abstrakt.read().to_string(),
+                        author_id: current_user.read().clone(),
+                        date: now.as_secs().to_string(),
+                        version: "1".to_string(),
+                        thumbnail_path: image_path.read().to_string(),
+                        folder_path: zip_path.read().to_string(),
+                        stars: 0,
+                        watching: 0,
+                        downloads: 0,
+                    };
+
+                    let result = database::initialize_database()
+                        .and_then(|conn| {
+                            database::ensure_default_account(&conn)?;
+                            database::insert_item(&conn, &item)
+                        });
+
+                    match result {
+                        Ok(()) => {
+                            nav.push(Route::Home {});
+                        }
+                        Err(err) => {
+                            upload_message.set(format!("Upload failed: {err}"));
+                        }
+                    }
                 },
                 "UPLOAD"
             }
+
+            if !upload_message.read().is_empty() {
+                p { "{upload_message}" }
+            }
+
             button {
                 class: "button",
                 id: "cancel_button",
