@@ -4,7 +4,7 @@ use dioxus::prelude::*;
 //Note each individual right hand component should be unique to the file slected.
 //So it must be a component too.
 #[component]
-pub fn IncomingRequest() -> Element {
+pub fn IncomingRequest(proposal_id: String) -> Element {
     let nav = navigator();
     //let item = Item {
     //    id: "1".into(),

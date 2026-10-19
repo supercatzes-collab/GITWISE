@@ -24,8 +24,8 @@
         Login {},
         #[route("/signin")]
         Signin,
-        #[route("/view_incoming_request")]
-        IncomingRequest,
+        #[route("/view_incoming_request/:proposal_id")]
+        IncomingRequest { proposal_id: String },
         #[route("/profile/:user_id")]
         Profile { user_id: String },
         #[route("/download/:item_id")]

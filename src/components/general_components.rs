@@ -444,8 +444,13 @@ pub fn PendingUpdates(
                 button {
                     class: "button",
                     id: "view_button",
-                    onclick: move |_| {
-                        nav.push(Route::IncomingRequest {});
+                    onclick: {
+                        let proposal_id = id.clone();
+                        move |_| {
+                            nav.push(Route::IncomingRequest {
+                                proposal_id: proposal_id.clone(),
+                            });
+                        }
                     },
                     "view"
                 }
