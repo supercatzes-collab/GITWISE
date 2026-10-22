@@ -11,7 +11,8 @@ pub struct PendingItem {
 
 #[derive(Clone, PartialEq)]
 pub struct OutgoingItem {
-    pub id: String,
+    pub id: String, // Proposal ID
+    pub item_id: String, // Existing item ID
     pub title: String,
     pub author: String,
     pub thumbnail_src: Asset,
@@ -33,10 +34,13 @@ pub fn FileDropzone(
     placeholder: &'static str,
     accept: &'static str,
     icon: Element,
+    #[props(default = false)]
+    directory: bool,
     on_select: EventHandler<String>,
 ) -> Element {
     rsx! {
         div { id: wrapper_id,
+
             div {
                 svg {
                     width: "40",
@@ -49,15 +53,31 @@ pub fn FileDropzone(
                     stroke_linejoin: "round",
                     {icon}
                 }
-                input {
-                    id: input_id,
-                    r#type: "file",
-                    accept,
-                    onchange: move |evt| {
-                        if let Some(file) = evt.files().first() {
-                            on_select.call(file.path().to_string_lossy().to_string());
-                        }
-                    },
+
+                if directory {
+                    button {
+                        id: input_id,
+                        r#type: "button",
+                        onclick: move |_| {
+                            if let Some(path) =
+                                rfd::FileDialog::new().pick_folder()
+                            {
+                                on_select.call(path.to_string_lossy().into_owned());
+                            }
+                        },
+                        "{placeholder}"
+                    }
+                } else {
+                    input {
+                        id: input_id,
+                        r#type: "file",
+                        accept,
+                        onchange: move |evt| {
+                            if let Some(file) = evt.files().first() {
+                                on_select.call(file.path().to_string_lossy().to_string());
+                            }
+                        },
+                    }
                 }
             }
         }

@@ -33,11 +33,12 @@ pub struct PendingProposal {
     pub date: String,
 }
 
-
-// Initialize the database and create tables if they don't exist.
+// Initialize the database, create tables, and seed demo data.
 pub fn initialize_database() -> Result<Connection> {
     let conn = Connection::open("gitwise.db")?;
+
     create_tables(&conn)?;
+
     Ok(conn)
 }
 
@@ -485,6 +486,52 @@ pub fn get_pending_proposals_for_owner(
     
 }
 
+#[derive(Clone, Debug, PartialEq)]
+pub struct OutgoingProposalRecord {
+    pub id: String,
+    pub item_id: String,
+    pub title: String,
+    pub author: String,
+    pub thumbnail_path: String,
+    pub status: String,
+}
+
+pub fn get_outgoing_proposals_for_user(
+    conn: &Connection,
+    user_id: &str,
+) -> Result<Vec<OutgoingProposalRecord>> {
+    let mut stmt = conn.prepare(
+        "
+        SELECT
+            p.id,
+            p.item_id,
+            i.title,
+            a.display_name,
+            i.thumbnail_path,
+            p.status
+        FROM proposals p
+        JOIN items i ON i.id = p.item_id
+        JOIN accounts a ON a.id = i.author_id
+        WHERE p.proposer_id = ?1
+        ORDER BY CAST(p.date AS INTEGER) DESC
+        ",
+    )?;
+
+    let proposals = stmt
+        .query_map([user_id], |row| {
+            Ok(OutgoingProposalRecord {
+                id: row.get(0)?,
+                item_id: row.get(1)?,
+                title: row.get(2)?,
+                author: row.get(3)?,
+                thumbnail_path: row.get(4)?,
+                status: row.get(5)?,
+            })
+        })?
+        .collect::<Result<Vec<OutgoingProposalRecord>>>()?;
+
+    Ok(proposals)
+}
 
 pub fn get_pending_proposal_by_id(
     conn: &Connection,
@@ -531,8 +578,6 @@ pub fn get_pending_proposal_by_id(
     )
     .optional()
 }
-
-
 
 // Accept or reject a pending proposal, provided the caller owns the item.
 // Returns true if the proposal was updated, false otherwise.
@@ -757,7 +802,163 @@ pub fn toggle_item_star(
         )?;
 
         Ok(())
-    }
+}
+
+
+#[derive(Clone, Debug, PartialEq)]
+pub struct WatchedItemRecord {
+    pub id: String,
+    pub title: String,
+    pub author: String,
+    pub thumbnail_path: String,
+}
+
+pub fn get_watched_items_for_user(
+    conn: &Connection,
+    user_id: &str,
+) -> Result<Vec<WatchedItemRecord>> {
+    let mut stmt = conn.prepare(
+        "
+        SELECT
+            i.id,
+            i.title,
+            a.display_name,
+            i.thumbnail_path
+        FROM item_watches w
+        JOIN items i ON i.id = w.item_id
+        JOIN accounts a ON a.id = i.author_id
+        WHERE w.user_id = ?1
+        ORDER BY i.date DESC
+        ",
+    )?;
+
+    let items = stmt
+        .query_map([user_id], |row| {
+            Ok(WatchedItemRecord {
+                id: row.get(0)?,
+                title: row.get(1)?,
+                author: row.get(2)?,
+                thumbnail_path: row.get(3)?,
+            })
+        })?
+        .collect::<Result<Vec<WatchedItemRecord>>>()?;
+
+    Ok(items)
+}
+
+pub fn insert_proposal(
+    conn: &Connection,
+    item_id: &str,
+    proposer_id: &str,
+    replacement_folder_path: &str,
+    note: &str,
+) -> Result<String> {
+    let now = chrono::Utc::now();
+
+    let proposal_id = format!("proposal-{}", now.timestamp_millis());
+    let date = now.timestamp().to_string();
+
+    conn.execute(
+        "
+        INSERT INTO proposals (
+            id,
+            item_id,
+            proposer_id,
+            replacement_folder_path,
+            note,
+            status,
+            date
+        )
+        VALUES (?1, ?2, ?3, ?4, ?5, 'Pending', ?6)
+        ",
+        rusqlite::params![
+            proposal_id,
+            item_id,
+            proposer_id,
+            replacement_folder_path,
+            note,
+            date,
+        ],
+    )?;
+
+    Ok(proposal_id)
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub struct ItemContributorRecord {
+    pub user_id: String,
+    pub display_name: String,
+    pub profile_img_path: String,
+}
+
+pub fn add_item_contributor(
+    conn: &Connection,
+    item_id: &str,
+    user_id: &str,
+) -> Result<()> {
+    let contributed_at = chrono::Utc::now()
+        .timestamp()
+        .to_string();
+
+    conn.execute(
+        "
+        INSERT OR IGNORE INTO item_contributors (
+            item_id,
+            user_id,
+            contribution_type,
+            contributed_at
+        )
+        VALUES (?1, ?2, ?3, ?4)
+        ",
+        rusqlite::params![
+            item_id,
+            user_id,
+            "Contributor",
+            contributed_at,
+        ],
+    )?;
+
+    Ok(())
+}
+  
+pub fn get_item_contributors(
+    conn: &Connection,
+    item_id: &str,
+) -> Result<Vec<ItemContributorRecord>> {
+    let mut stmt = conn.prepare(
+        "
+        SELECT
+            a.id,
+            a.display_name,
+            a.profile_img_path
+        FROM item_contributors ic
+        JOIN accounts a ON a.id = ic.user_id
+        WHERE ic.item_id = ?1
+        ORDER BY CAST(ic.contributed_at AS INTEGER) DESC
+        ",
+    )?;
+
+    let contributors = stmt
+        .query_map([item_id], |row| {
+            Ok(ItemContributorRecord {
+                user_id: row.get(0)?,
+                display_name: row.get(1)?,
+                profile_img_path: row.get(2)?,
+            })
+        })?
+        .collect::<Result<Vec<ItemContributorRecord>>>()?;
+
+    Ok(contributors)
+}
+
+
+
+
+
+
+
+
+
 
 #[cfg(test)]
 #[path = "database_tests/mod.rs"]

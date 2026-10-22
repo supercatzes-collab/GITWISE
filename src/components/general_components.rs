@@ -5,6 +5,9 @@ use crate::database::{
     get_account_profile,
     initialize_database,
     get_items_by_author,
+    get_pending_proposals_for_owner,
+    get_watched_items_for_user,
+    get_outgoing_proposals_for_user,
 };
 use crate::route::Route;
 use dioxus::prelude::*;
@@ -35,6 +38,7 @@ pub fn ProfileCard(profile: UserProfile, children: Element) -> Element {
 pub fn ProfileSidebar(user_id: String) -> Element {
     let me: Signal<String> = use_context();
     let is_mine = user_id == me.read().clone();
+
     let profile_id = user_id.clone();
 
     let profile = use_resource(move || {
@@ -44,20 +48,22 @@ pub fn ProfileSidebar(user_id: String) -> Element {
             let conn = initialize_database()
                 .map_err(|err| err.to_string())?;
 
-            let db_profile = get_account_profile(&conn, &profile_id)
-                .map_err(|err| err.to_string())?
-                .ok_or_else(|| "Account profile not found".to_string())?;
+            let db_profile =
+                get_account_profile(&conn, &profile_id)
+                    .map_err(|err| err.to_string())?
+                    .ok_or_else(|| "Account profile not found".to_string())?;
 
             let credentials: Vec<String> =
                 serde_json::from_str(&db_profile.credentials)
                     .unwrap_or_default();
 
-            let profile_img = match db_profile.profile_img_path.as_str() {
-                "assets/img_assets/profile_1.jpg" => {
-                    asset!("/assets/img_assets/profile_1.jpg")
-                }
-                _ => asset!("/assets/img_assets/profile.jpg"),
-            };
+            let profile_img =
+                match db_profile.profile_img_path.as_str() {
+                    "assets/img_assets/profile_1.jpg" => {
+                        asset!("/assets/img_assets/profile_1.jpg")
+                    }
+                    _ => asset!("/assets/img_assets/profile.jpg"),
+                };
 
             Ok::<UserProfile, String>(UserProfile {
                 name: db_profile.display_name,
@@ -67,13 +73,70 @@ pub fn ProfileSidebar(user_id: String) -> Element {
         }
     });
 
+    // Fetch the action counts for this account.
+    let counts_user_id = user_id.clone();
+
+    let action_counts = use_resource(move || {
+        let counts_user_id = counts_user_id.clone();
+
+        async move {
+            let conn = initialize_database()
+                .map_err(|err| err.to_string())?;
+
+            let pending_count =
+                get_pending_proposals_for_owner(
+                    &conn,
+                    &counts_user_id,
+                )
+                .map_err(|err| err.to_string())?
+                .len();
+
+            let watching_count =
+                get_watched_items_for_user(
+                    &conn,
+                    &counts_user_id,
+                )
+                .map_err(|err| err.to_string())?
+                .len();
+
+            let outgoing_count =
+                get_outgoing_proposals_for_user(
+                    &conn,
+                    &counts_user_id,
+                )
+                .map_err(|err| err.to_string())?
+                .len();
+
+            Ok::<(usize, usize, usize), String>((
+                pending_count,
+                watching_count,
+                outgoing_count,
+            ))
+        }
+    });
+
     rsx! {
         match &*profile.read() {
             Some(Ok(profile_data)) => rsx! {
                 ProfileCard { profile: profile_data.clone(),
 
                     if is_mine {
-                        ProfileActions { pending_count: 2, watching_count: 1, outgoing_count: 0 }
+                        match &*action_counts.read() {
+                            Some(Ok((pending_count, watching_count, outgoing_count))) => rsx! {
+                                ProfileActions {
+                                    pending_count: *pending_count,
+                                    watching_count: *watching_count,
+                                    outgoing_count: *outgoing_count,
+                                }
+                            },
+
+                            Some(Err(err)) => rsx! {
+                                p { "Could not load action counts: {err}" }
+                            },
+                            None => rsx! {
+                                p { "Loading action counts..." }
+                            },
+                        }
                     }
                 }
             },
@@ -322,7 +385,8 @@ pub fn WatchingUpdates(
     on_dismiss: EventHandler<String>,
 ) -> Element {
     let nav = navigator();
-
+    let view_id = id.clone();
+    let dismiss_id = id.clone();
     rsx! {
         div { class: "notification_content", id: "{id}",
             img { src: img_src, id: "thumbnail_img_notif" }
@@ -334,7 +398,7 @@ pub fn WatchingUpdates(
                 id: "view_button",
                 onclick: move |_| {
                     nav.push(Route::Download {
-                        item_id: "1".to_string(),
+                        item_id: view_id.clone(),
                     });
                 },
                 "view"
@@ -343,7 +407,7 @@ pub fn WatchingUpdates(
             button {
                 class: "button",
                 id: "dismiss_button",
-                onclick: move |_| on_dismiss.call(id.clone()),
+                onclick: move |_| on_dismiss.call(dismiss_id.clone()),
                 "dismiss"
             }
         }
@@ -469,6 +533,7 @@ pub fn PendingUpdates(
 #[component]
 pub fn OutgoingUpdates(
     id: String,
+    item_id: String,
     img_src: Asset,
     title: String,
     author: String,
@@ -476,6 +541,8 @@ pub fn OutgoingUpdates(
     on_dismiss: EventHandler<String>,
 ) -> Element {
     let nav = navigator();
+    let view_item_id = item_id.clone();
+    let dismiss_id = id.clone();
 
     let status_class = match status {
         State::Pending => "status_pending",
@@ -494,7 +561,7 @@ pub fn OutgoingUpdates(
                 id: "view_button",
                 onclick: move |_| {
                     nav.push(Route::Download {
-                        item_id: "1".to_string(),
+                        item_id: view_item_id.clone(),
                     });
                 },
                 "view"
@@ -503,7 +570,7 @@ pub fn OutgoingUpdates(
             button {
                 class: "button",
                 id: "dismiss_button",
-                onclick: move |_| on_dismiss.call(id.clone()),
+                onclick: move |_| on_dismiss.call(dismiss_id.clone()),
                 "dismiss"
             }
         }

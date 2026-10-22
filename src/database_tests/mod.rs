@@ -173,6 +173,7 @@ fn seed_test_data_test() {
     println!("Seed data inserted successfully!");
 }
 
+
 #[test]
 fn get_pending_proposals_for_owner_test() {
     let conn = Connection::open_in_memory().unwrap();
@@ -180,7 +181,7 @@ fn get_pending_proposals_for_owner_test() {
     // Create the tables required by the query.
     conn.execute_batch(
         "
-        CREATE TABLE accounts ( 
+        CREATE TABLE accounts (
             id TEXT PRIMARY KEY,
             username TEXT NOT NULL UNIQUE,
             password TEXT NOT NULL,
@@ -216,7 +217,7 @@ fn get_pending_proposals_for_owner_test() {
         INSERT INTO accounts VALUES
             ('test-001', 'owner', 'pass', 'Owner', 'owner.jpg', '[]'),
             ('test-002', 'contributor', 'pass', 'Contributor', 'contributor.jpg', '[]');
-            
+
         INSERT INTO items VALUES
             ('item-001', 'Owner Item', 'Description', 'test-001',
              '2026-10-16', '1.0', 'thumbnail.jpg', 'Library/item-001/'),
@@ -263,20 +264,46 @@ fn get_pending_proposals_for_owner_test() {
     )
     .unwrap();
 
-    let proposals = get_pending_proposals_for_owner(&conn, "test-001").unwrap();
+    let proposals =
+        get_pending_proposals_for_owner(&conn, "test-001").unwrap();
 
+    // Verify that only the owner's pending proposal is returned.
     assert_eq!(proposals.len(), 1);
+
+    // Verify proposal and item information.
     assert_eq!(proposals[0].id, "proposal-001");
     assert_eq!(proposals[0].item_title, "Owner Item");
     assert_eq!(proposals[0].proposer_id, "test-002");
     assert_eq!(proposals[0].proposer_name, "Contributor");
     assert_eq!(proposals[0].note, "Improve the example.");
 
+    // Verify image paths.
+    assert_eq!(
+        proposals[0].proposer_img_path,
+        "contributor.jpg"
+    );
+    assert_eq!(
+        proposals[0].item_thumbnail_path,
+        "thumbnail.jpg"
+    );
+
+    // Verify folder paths.
+    assert_eq!(
+        proposals[0].original_folder_path,
+        "Library/item-001/"
+    );
+    assert_eq!(
+        proposals[0].replacement_folder_path,
+        "Submissions/proposal-001/"
+    );
+
     // An account with no owned items should get no proposals.
-    let proposals = get_pending_proposals_for_owner(&conn, "unknown-user").unwrap();
+    let proposals =
+        get_pending_proposals_for_owner(&conn, "unknown-user").unwrap();
 
     assert!(proposals.is_empty());
 }
+
 
 #[test]
 fn update_proposal_status_test() {
@@ -490,3 +517,31 @@ fn get_profile_counts_test() -> rusqlite::Result<()> {
 
     Ok(())
 }
+
+
+#[test]
+fn get_watched_items_for_user_test() {
+    let conn = Connection::open_in_memory().unwrap();
+
+    create_tables(&conn).unwrap();
+    seed_test_data(&conn).unwrap();
+
+    let items =
+        get_watched_items_for_user(&conn, "test-002").unwrap();
+
+    assert_eq!(items.len(), 1);
+    assert_eq!(items[0].id, "item-001");
+    assert_eq!(items[0].title, "Rust Concurrency Toolkit");
+    assert_eq!(items[0].author, "Alan Turing");
+    assert_eq!(
+        items[0].thumbnail_path,
+        "assets/img_assets/profile.jpg"
+    );
+
+    // The owner has not watched any items in the seeded data.
+    let owner_items =
+        get_watched_items_for_user(&conn, "test-001").unwrap();
+
+    assert!(owner_items.is_empty());
+}
+

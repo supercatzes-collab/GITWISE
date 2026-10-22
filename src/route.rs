@@ -27,7 +27,7 @@
         #[route("/view_incoming_request/:proposal_id")]
         IncomingRequest { proposal_id: String },
         #[route("/profile/:user_id")]
-        Profile { user_id: String },
+        Profile {user_id: String},
         #[route("/download/:item_id")]
         Download { item_id: String },
         #[route("/contribute/:item_id")]

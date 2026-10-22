@@ -110,8 +110,8 @@
 }
 
 /* ============ Upload button ============ */
-#cancel_button,
-#upload_button {
+#cancel_contribution_btn,
+#upload_contribution_btn, #reject_contribution_btn  {
     box-sizing: border-box;
     width: 100%;
     height: 40px;
@@ -123,12 +123,18 @@
     transition: transform 0.15s ease, filter 0.15s ease;
 }
 
-#cancel_button {
+#cancel_contribution_btn {
+    color: var(--color-text);
+    border: 2px solid var(--color-bg-raised);
+}
+
+#reject_contribution_btn {
+    margin-top: 20px;
     color: red;
     border: 2px solid red;
 }
 
-#upload_button {
+#upload_contribution_btn {
     color: chartreuse;
     border: 2px solid chartreuse;
 }

@@ -1,36 +1,37 @@
 use crate::components::*;
 use crate::Route;
 use dioxus::prelude::*;
+use crate::database::{
+    get_item_by_id,
+    initialize_database,
+    insert_proposal,
+};
 //Note each individual right hand component should be unique to the file slected. So it must be a component too.
 
 #[component]
 pub fn Contribute(item_id: String) -> Element {
-    //let item = Item {
-    //    id: "1".into(),
-    //    title: "Lorem ipsum dolor sit amet".into(),
-    //    other fields
-    //};
-    // later: let item = get_item(&item_id);
-    let nav = navigator();
     let mut chosen = use_signal(String::new);
-    //temporary
-    let title = "Lorem ipsum dolor sit amet consectetur adipiscing elit";
-    let mut selected = use_signal(|| 0usize);
     let mut note = use_signal(String::new);
-    let files = use_signal(|| {
-        vec![
-            //Needs to replaced by an SQL fetch
-            FileEntry {
-                folder: "GITWISE".into(),
-                name: "chapter1.docx".into(),
-                size: 8,
-                version: "v1.2.3".into(),
-                updated: "5/05/26".into(),
-            },
-            // more entries
-        ]
+
+    let title_item_id = item_id.clone();
+
+    let title = use_signal(move || {
+        let conn = initialize_database()
+            .expect("Failed to initialize database");
+
+        get_item_by_id(&conn, &title_item_id)
+            .expect("Failed to fetch item")
+            .map(|item| item.title)
+            .unwrap_or_else(|| "Unknown item".to_string())
     });
-    let selected_file = files.read().get(*selected.read()).cloned();
+
+    let submit_item_id = item_id.clone();
+    let cancel_item_id = item_id.clone();
+
+    let nav = navigator();
+    let submit_nav = nav.clone();
+    let cancel_nav = nav.clone();
+    let me: Signal<String> = use_context();
     rsx! {
         div { class: "container", id: "mother_container",
             div { class: "container", id: "main_container",
@@ -41,35 +42,29 @@ pub fn Contribute(item_id: String) -> Element {
 
                 div { class: "container", id: "secondary_main_container",
                     div { class: "container", id: "left_inner_container",
-                        p { id: "left_inner_header", "Choose a file to replace:" }
-                        //Needs to replaced by an SQL fetch
-                        for (i , file) in files.read().iter().enumerate() {
-                            FileItem {
-                                key: "{i}",
-                                title: file.folder.clone(),
-                                selected_file: file.name.clone(),
-                                file_size: file.size,
-                                selected: i == *selected.read(),
-                                on_click: move |_| selected.set(i),
-                            }
+
+                        p { id: "left_inner_header", "Replacement folder path:" }
+
+                        if chosen.read().is_empty() {
+                            p { class: "page_sub_text", "No folder selected yet." }
+                        } else {
+                            p { id: "selected_folder_path", "{chosen}" }
                         }
                     }
 
                     div { class: "container", id: "right_inner_container",
                         div { class: "container", id: "right_inner_header",
+
                             p {
                                 id: "right_inner_header_text",
                                 class: "page_sub_text",
-                                "Replacing: "
+                                "Replacing with folder:"
                             }
-                            //Needs to replaced by an SQL fetch
-                            if let Some(file) = &selected_file {
-                                SelectedFileItemDetails {
-                                    selected_file: format!("{}/{}", file.folder, file.name),
-                                    version: file.version.clone(),
-                                    file_size: file.size,
-                                    update: file.updated.clone(),
-                                }
+
+                            if chosen.read().is_empty() {
+                                p { class: "page_sub_text", "No replacement folder selected." }
+                            } else {
+                                p { id: "replacement_folder_details", "{chosen}" }
                             }
                         }
 
@@ -78,8 +73,10 @@ pub fn Contribute(item_id: String) -> Element {
                             wrapper_id: "upload_zipfile",
                             header_id: "upload_header_zipfile",
                             input_id: "upload_input_zipfile",
-                            placeholder: "UPLOAD ZIP",
-                            accept: "folder/*",
+                            placeholder: "SELECT FOLDER",
+                            accept: "",
+                            directory: true,
+
                             icon: rsx! {
                                 path { d: "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" }
                                 polyline { points: "17 8 12 3 7 8" }
@@ -90,10 +87,10 @@ pub fn Contribute(item_id: String) -> Element {
                                     y2: "15",
                                 }
                             },
+
                             on_select: move |path: String| {
                                 chosen.set(path);
                             },
-
                         }
 
                         p {
@@ -111,13 +108,30 @@ pub fn Contribute(item_id: String) -> Element {
                             class: "button",
                             id: "upload_contribution_btn",
                             onclick: move |_| {
-                                //temporary: replace this with the call that inserts the proposal
-                                println!(
-                                    "submit: file={} note={}",
-                                    chosen.read().as_str(),
-                                    note.read().as_str(),
-                                );
-                                nav.push(Route::Outgoing {});
+                                let replacement_folder_path =
+                                    chosen.read().trim().to_string();
+
+                                let note_text = note.read().trim().to_string();
+                                let proposer_id = me.read().clone();
+
+                                if replacement_folder_path.is_empty() {
+                                    println!("Please select a replacement folder first.");
+                                    return;
+                                }
+
+                                let conn = initialize_database()
+                                    .expect("Failed to initialize database");
+
+                                insert_proposal(
+                                        &conn,
+                                        &submit_item_id,
+                                        &proposer_id,
+                                        &replacement_folder_path,
+                                        &note_text,
+                                    )
+                                    .expect("Failed to submit contribution proposal");
+
+                                submit_nav.push(Route::Outgoing {});
                             },
                             "SUBMIT EDIT REQUEST"
                         }
@@ -125,9 +139,10 @@ pub fn Contribute(item_id: String) -> Element {
                             class: "button",
                             id: "cancel_contribution_btn",
                             onclick: move |_| {
-                                nav.push(Route::Download {
-                                    item_id: "1".to_string(),
-                                });
+                                cancel_nav
+                                    .push(Route::Download {
+                                        item_id: cancel_item_id.clone(),
+                                    });
                             },
                             "CANCEL"
                         }

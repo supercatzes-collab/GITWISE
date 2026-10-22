@@ -1,28 +1,43 @@
 //pending.rs
 use crate::components::*;
 use dioxus::prelude::*;
+use crate::database::{
+    initialize_database,
+    get_pending_proposals_for_owner,
+};
 
 #[component]
 pub fn Pending() -> Element {
-    let mut pending = use_signal(|| {
-        vec![
-            //replace this with sql fetches
-            PendingItem {
-                id: "pending_1".into(),
-                title: "lorem ipsum dolor sit amet consectetur adipiscing elit velit libero temporibus occaecat occaecat occaecat occaecat".into(),
-                author: "Ada Lovelace".into(),
-                author_img_src: asset!("/assets/img_assets/profile.jpg"),
-                thumbnail_src: asset!("/assets/img_assets/thumbnail.jpg"),
-            },
-        ]
+    let me: Signal<String> = use_context();
+    
+    let mut pending = use_signal(|| Vec::<PendingItem>::new());
+
+    use_effect(move || {
+        let conn = initialize_database()
+            .expect("Failed to initialize database");
+    
+        let owner_id = me();
+    
+        let items = get_pending_proposals_for_owner(&conn, &owner_id)
+            .expect("Failed to fetch pending proposals")
+            .into_iter()
+            .map(|proposal| PendingItem {
+                // This is proposals.id, not items.id.
+                id: proposal.id,
+                title: proposal.item_title,
+                author: proposal.proposer_name,
+                author_img_src: get_thumbnail(&proposal.proposer_img_path),
+                thumbnail_src: get_thumbnail(&proposal.item_thumbnail_path),
+            })
+            .collect::<Vec<PendingItem>>();
+        
+        pending.set(items);
     });
 
     //let nav = navigator();
     rsx! {
         div { class: "container", id: "mother_container",
-            ProfileCard { profile: placeholder_profile(),
-                ProfileActions { pending_count: 2, watching_count: 1, outgoing_count: 0 }
-            }
+            ProfileSidebar { user_id: me() }
 
             div { class: "container", id: "right_container",
                 div { class: "container", id: "header", "PENDING CONTRIBUTIONS" }

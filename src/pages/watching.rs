@@ -10,25 +10,39 @@ struct WatchingItem {
     thumbnail_src: Asset,
 }
 
+use crate::database::{
+    initialize_database,
+    get_watched_items_for_user,
+};
+
 #[component]
 pub fn Watching() -> Element {
-    let mut watching = use_signal(|| {
-        vec![
-            //should be done through an api call from sqlite database
-            WatchingItem {
-                id: "watching_1".into(),
-                title: "lorem ipsum dolor sit amet consectetur adipiscing elit velit libero temporibus occaecat occaecat occaecat occaecat".into(),
-                author: "Alan Turing".into(),
-                thumbnail_src: asset!("/assets/img_assets/thumbnail.jpg"),
-            },
-        ]
-    });
+   let me: Signal<String> = use_context();
 
+    let mut watching = use_signal(|| Vec::<WatchingItem>::new());
+
+    use_effect(move || {
+        let conn = initialize_database()
+            .expect("Failed to initialize database");
+
+        let user_id = me();
+
+        let items = get_watched_items_for_user(&conn, &user_id)
+            .expect("Failed to fetch watched items")
+            .into_iter()
+            .map(|item| WatchingItem {
+                id: item.id,
+                title: item.title,
+                author: item.author,
+                thumbnail_src: get_thumbnail(&item.thumbnail_path),
+            })
+            .collect::<Vec<WatchingItem>>();
+
+        watching.set(items);
+    });
     rsx! {
         div { class: "container", id: "mother_container",
-            ProfileCard { profile: placeholder_profile(),
-                ProfileActions { pending_count: 2, watching_count: 1, outgoing_count: 0 }
-            }
+            ProfileSidebar { user_id: me() }
 
             div { class: "container", id: "right_container",
                 div { class: "container", id: "header", "WATCHING TITLES" }
