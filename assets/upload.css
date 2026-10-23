@@ -111,7 +111,11 @@
 
 /* ============ Upload button ============ */
 #cancel_contribution_btn,
-#upload_contribution_btn, #reject_contribution_btn  {
+#upload_contribution_btn, 
+#reject_contribution_btn, 
+#upload_button, 
+#cancel_button,
+#download_modified_folder_btn  {
     box-sizing: border-box;
     width: 100%;
     height: 40px;
@@ -123,7 +127,7 @@
     transition: transform 0.15s ease, filter 0.15s ease;
 }
 
-#cancel_contribution_btn {
+#cancel_contribution_btn, #cancel_button {
     color: var(--color-text);
     border: 2px solid var(--color-bg-raised);
 }
@@ -134,7 +138,9 @@
     border: 2px solid red;
 }
 
-#upload_contribution_btn {
+#upload_contribution_btn, 
+#upload_button,
+#download_modified_folder_btn {
     color: chartreuse;
     border: 2px solid chartreuse;
 }
@@ -142,4 +148,8 @@
 #upload_input_title, #upload_input_abstract {
     color: #fff;
     font-size: 1.2rem;
+}
+
+#download_modified_folder_btn {
+    margin-top: 20px;
 }

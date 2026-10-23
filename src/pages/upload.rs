@@ -5,6 +5,13 @@ use crate::route::Route;
 use dioxus::prelude::*;
 use std::time::{SystemTime, UNIX_EPOCH};
 
+use crate::filesystem::{
+    copy_folder_recursive,
+    ensure_storage_directories,
+    item_folder_path,
+};
+use std::path::PathBuf;
+
 #[component]
 pub fn Upload() -> Element {
     let nav = navigator();
@@ -79,40 +86,98 @@ pub fn Upload() -> Element {
             button {
                 class: "button",
                 id: "upload_button",
+
                 onclick: move |_| {
+                    // Validate the selected folder.
+                    let selected_folder = zip_path.read().trim().to_string();
+
+                    if selected_folder.is_empty() {
+                        upload_message.set("Please select a folder to upload.".to_string());
+                        return;
+                    }
+
+                    let source_folder = PathBuf::from(&selected_folder);
+
+                    if !source_folder.is_dir() {
+                        upload_message.set("The selected folder does not exist.".to_string());
+                        return;
+                    }
+
                     let now = SystemTime::now()
                         .duration_since(UNIX_EPOCH)
                         .unwrap_or_default();
 
-                    let item = Item {
-                        id: format!("item-{}", now.as_millis()),
-                        title: title.read().to_string(),
-                        abstract_text: abstrakt.read().to_string(),
-                        author_id: current_user.read().clone(),
-                        date: now.as_secs().to_string(),
-                        version: "1".to_string(),
-                        thumbnail_path: image_path.read().to_string(),
-                        folder_path: zip_path.read().to_string(),
-                        stars: 0,
-                        watching: 0,
-                        downloads: 0,
-                    };
+                    let item_id = format!("item-{}", now.as_millis());
+                    let author_id = current_user.read().clone();
 
-                    let result = database::initialize_database()
-                        .and_then(|conn| {
-                            database::ensure_default_account(&conn)?;
-                            database::insert_item(&conn, &item)
-                        });
+                    let result = (|| -> Result<(), String> {
+                        // Ensure the shared library and user workspace exist.
+                        ensure_storage_directories(&author_id)
+                            .map_err(|err| err.to_string())?;
 
+                        // Resolve the permanent destination in LIBRARY.
+                        let destination = item_folder_path(&item_id)
+                            .map_err(|err| err.to_string())?;
+                        copy_folder_recursive(&source_folder, &destination)
+                            .map_err(|err| { format!("Failed to copy uploaded folder: {err}") })?;
+                        let stored_folder_path = PathBuf::from("LIBRARY")
+                            .join(&item_id)
+                            .to_string_lossy()
+                            .into_owned();
+
+                        let item = Item {
+                            id: item_id.clone(),
+                            title: title.read().trim().to_string(),
+                            abstract_text: abstrakt.read().trim().to_string(),
+                            author_id: author_id.clone(),
+                            date: now.as_secs().to_string(),
+                            version: "1".to_string(),
+                            thumbnail_path: image_path.read().to_string(),
+                            folder_path: stored_folder_path,
+                            stars: 0,
+                            watching: 0,
+                            downloads: 0,
+                        };
+
+                        // Insert the database record after the folder copy succeeds.
+                        let database_result = database::initialize_database()
+                            .map_err(|err| err.to_string())
+                            .and_then(|conn| {
+                                database::ensure_default_account(&conn)
+                                    .map_err(|err| err.to_string())?;
+
+                                database::insert_item(&conn, &item)
+                                    .map_err(|err| err.to_string())
+                            });
+
+                        if let Err(error) = database_result {
+                            // Avoid leaving an orphaned library folder
+                            // if the database insert fails.
+                            if let Err(cleanup_error) =
+                                std::fs::remove_dir_all(&destination)
+                            {
+                                return Err(
+                                    format!(
+                                        "Database insert failed: {error}. \
+                                     Cleanup of {} also failed: {cleanup_error}",
+                                        destination.display(),
+                                    ),
+                                );
+                            }
+                            return Err(format!("Failed to save item to database: {error}"));
+                        }
+                        Ok(())
+                    })();
                     match result {
                         Ok(()) => {
                             nav.push(Route::Home {});
                         }
-                        Err(err) => {
-                            upload_message.set(format!("Upload failed: {err}"));
+                        Err(error) => {
+                            upload_message.set(format!("Upload failed: {error}"));
                         }
                     }
                 },
+
                 "UPLOAD"
             }
 

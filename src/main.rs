@@ -5,6 +5,10 @@ pub mod database;
 pub mod navbar;
 pub mod pages;
 pub mod route;
+pub mod filesystem;
+
+#[cfg(test)]
+mod filesystem_tests;
 
 use route::Route;
 
@@ -55,3 +59,4 @@ fn App() -> Element {
         },
     }
 }
+

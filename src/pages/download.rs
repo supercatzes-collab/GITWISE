@@ -12,6 +12,16 @@ use crate::database::{
 use crate::Route;
 use chrono::{Local, TimeZone};
 use dioxus::prelude::*;
+
+use crate::filesystem::{
+    available_destination_path,
+    copy_folder_recursive,
+    ensure_storage_directories,
+    environment_root,
+    user_item_folder_path,
+};
+use std::path::PathBuf;
+
 //#[derive(Clone, PartialEq)]
 //struct ContributorProfileCardData {
 //    user_id: String,
@@ -117,16 +127,102 @@ pub fn Download(item_id: String) -> Element {
                             abstrakt: item.abstract_text.clone(),
                             on_download: {
                                 let download_item_id = item_id.clone();
+                                let download_source_path = item.folder_path.clone();
+                                let download_user_id = current_user.read().clone();
+
                                 move |_| {
-                                    let conn = initialize_database()
-                                        .expect("Failed to initialize database");
-                                    increment_item_downloads(&conn, &download_item_id)
-                                        .expect("Failed to increment download count");
+                                    // Ensure the library and current user's workspace exist.
+                                    if let Err(error) =
+                                        ensure_storage_directories(&download_user_id)
+                                    {
+                                        eprintln!("Failed to prepare storage directories: {error}");
+                                        return;
+                                    }
+
+                                    // Resolve the source folder from the database path.
+                                    let stored_source =
+                                        PathBuf::from(&download_source_path);
+
+                                    let source = if stored_source.is_absolute() {
+                                        stored_source
+                                    } else {
+                                        environment_root().join(stored_source)
+                                    };
+
+                                    if !source.is_dir() {
+                                        eprintln!(
+                                            "Download failed: source folder does not exist: {}",
+                                            source.display(),
+                                        );
+                                        return;
+                                    }
+
+                                    let desired_destination = match user_item_folder_path(
+                                        &download_user_id,
+                                        &download_item_id,
+                                    ) {
+                                        Ok(path) => path,
+                                        Err(error) => {
+                                            eprintln!("Failed to resolve destination: {error}");
+                                            return;
+                                        }
+                                    };
+
+                                    let destination =
+                                        match available_destination_path(&desired_destination) {
+                                        Ok(path) => path,
+                                        Err(error) => {
+                                            eprintln!("Failed to find an available folder name: {error}");
+                                            return;
+                                        }
+                                    };
+
+                                    // Copy the entire folder without overwriting existing data.
+                                    if let Err(error) =
+                                        copy_folder_recursive(&source, &destination)
+                                    {
+                                        eprintln!("Download failed: {error}");
+                                        return;
+                                    }
+
+                                    // Count the download only after copying succeeds.
+                                    let conn = match initialize_database() {
+                                        Ok(conn) => conn,
+                                        Err(error) => {
+                                            eprintln!(
+                                                "Folder copied, but database initialization failed: {error}",
+                                            );
+                                            return;
+                                        }
+                                    };
+
+                                    if let Err(error) =
+                                        increment_item_downloads(&conn, &download_item_id)
+                                    {
+                                        eprintln!("Folder copied, but download count update failed: {error}");
+                                        return;
+                                    }
+
                                     download_count_refresh += 1;
+
+                                    println!(
+                                        "Downloaded item {} to {}",
+                                        download_item_id,
+                                        destination.display(),
+                                    );
+
+                                    // Open File Explorer at the downloaded item's folder.
+                                    if let Err(error) = std::process::Command::new("explorer.exe")
+                                        .arg(&destination)
+                                        .spawn()
+                                    {
+                                        eprintln!(
+                                            "Download succeeded, but File Explorer could not open: {error}",
+                                        );
+                                    }
                                 }
                             },
                         }
-                    
                     }
                     div { class: "container", id: "details_container",
                         StatsBtns {
